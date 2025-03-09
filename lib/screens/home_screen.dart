@@ -34,47 +34,51 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _downloadMedia() async {
-    if (_mediaUrl.isEmpty) return;
+ void _downloadMedia() async {
+  if (_mediaUrl.isEmpty) {
+    print('Media URL is empty'); // Debug log
+    return;
+  }
 
-    setState(() {
-      _isDownloading = true;
-    });
+  setState(() {
+    _isDownloading = true;
+  });
 
-    // Debug log: Requesting storage permission
-    print('Requesting storage permission...');
-    final status = await Permission.storage.request();
+  // Debug log: Requesting storage permission
+  print('Requesting storage permission...');
+  final status = await Permission.storage.request();
 
-    // Debug log: Permission status
-    print('Permission status: $status');
+  // Debug log: Permission status
+  print('Permission status: $status');
 
-    if (!status.isGranted) {
-      // Debug log: Permission denied
-      print('Permission denied. Redirecting to app settings...');
-      Fluttertoast.showToast(msg: 'Storage permission denied. Please enable it in app settings.');
-      await openAppSettings(); // Redirect to app settings
-      setState(() {
-        _isDownloading = false;
-      });
-      return;
-    }
-
-    // Debug log: Permission granted
-    print('Permission granted. Downloading media...');
-
-    // Download the media
-    final savePath = await Downloader.downloadMedia(_mediaUrl);
-    if (savePath != null) {
-      Fluttertoast.showToast(msg: 'Downloaded successfully to $savePath');
-    } else {
-      Fluttertoast.showToast(msg: 'Failed to download');
-    }
-
+  if (!status.isGranted) {
+    // Debug log: Permission denied
+    print('Permission denied. Redirecting to app settings...');
+    Fluttertoast.showToast(msg: 'Storage permission denied. Please enable it in app settings.');
+    await openAppSettings(); // Redirect to app settings
     setState(() {
       _isDownloading = false;
     });
+    return;
   }
 
+  // Debug log: Permission granted
+  print('Permission granted. Downloading media...');
+
+  // Download the media
+  final savePath = await Downloader.downloadMedia(_mediaUrl);
+  if (savePath != null) {
+    print('Media downloaded successfully to: $savePath'); // Debug log
+    Fluttertoast.showToast(msg: 'Downloaded successfully to $savePath');
+  } else {
+    print('Failed to download media'); // Debug log
+    Fluttertoast.showToast(msg: 'Failed to download');
+  }
+
+  setState(() {
+    _isDownloading = false;
+  });
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

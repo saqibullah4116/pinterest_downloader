@@ -15,17 +15,22 @@ class UrlValidator {
         // Extract image URL
         final imageElement = document.querySelector('img');
         if (imageElement != null) {
-          return imageElement.attributes['src'];
+          final imageUrl = imageElement.attributes['src'];
+          print('Extracted image URL: $imageUrl'); // Debug log
+          return imageUrl;
         }
 
         // Extract video URL
         final videoElement = document.querySelector('video');
         if (videoElement != null) {
-          return videoElement.attributes['src'];
+          final videoUrl = videoElement.attributes['src'];
+          print('Extracted video URL: $videoUrl'); // Debug log
+          return videoUrl;
         }
       }
       return null;
     } catch (e) {
+      print('Error extracting media URL: $e'); // Debug log
       return null;
     }
   }
