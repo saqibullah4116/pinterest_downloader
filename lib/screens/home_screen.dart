@@ -7,7 +7,10 @@ import '../utils/downloader.dart';
 import '../components/media_preview.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 
@@ -34,9 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
- void _downloadMedia() async {
+void _downloadMedia() async {
   if (_mediaUrl.isEmpty) {
-    print('Media URL is empty'); // Debug log
+    print('Media URL is empty');
     return;
   }
 
@@ -44,34 +47,50 @@ class _HomeScreenState extends State<HomeScreen> {
     _isDownloading = true;
   });
 
-  // Debug log: Requesting storage permission
-  print('Requesting storage permission...');
-  final status = await Permission.storage.request();
+  print('Checking permissions...');
 
-  // Debug log: Permission status
-  print('Permission status: $status');
+  bool hasPermission = false;
 
-  if (!status.isGranted) {
-    // Debug log: Permission denied
-    print('Permission denied. Redirecting to app settings...');
-    Fluttertoast.showToast(msg: 'Storage permission denied. Please enable it in app settings.');
-    await openAppSettings(); // Redirect to app settings
+  if (_mediaType.contains('video')) {
+    if (await Permission.videos.isGranted) {
+      hasPermission = true;
+      print('Videos permission already granted');
+    } else {
+      print('Requesting videos permission...');
+      final status = await Permission.videos.request();
+      hasPermission = status.isGranted;
+      print('Videos permission status: $status');
+    }
+  } else {
+    if (await Permission.photos.isGranted) {
+      hasPermission = true;
+      print('Photos permission already granted');
+    } else {
+      print('Requesting photos permission...');
+      final status = await Permission.photos.request();
+      hasPermission = status.isGranted;
+      print('Photos permission status: $status');
+    }
+  }
+
+  if (!hasPermission) {
+    print('Permission denied. Showing toast...');
+    Fluttertoast.showToast(msg: 'Gallery permission required to download media');
     setState(() {
       _isDownloading = false;
     });
     return;
   }
 
-  // Debug log: Permission granted
-  print('Permission granted. Downloading media...');
+  print('Proceeding with download...');
 
   // Download the media
-  final savePath = await Downloader.downloadMedia(_mediaUrl);
+  final savePath = await Downloader.downloadMedia(_mediaUrl, mediaType: _mediaType);
   if (savePath != null) {
-    print('Media downloaded successfully to: $savePath'); // Debug log
-    Fluttertoast.showToast(msg: 'Downloaded successfully to $savePath');
+    print('Media downloaded successfully to: $savePath');
+    Fluttertoast.showToast(msg: '${_mediaType.contains('video') ? 'Video' : 'Image'} downloaded successfully to Gallery');
   } else {
-    print('Failed to download media'); // Debug log
+    print('Failed to download media');
     Fluttertoast.showToast(msg: 'Failed to download');
   }
 

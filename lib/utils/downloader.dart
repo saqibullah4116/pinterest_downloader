@@ -1,68 +1,58 @@
-import 'package:dio/dio.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/services.dart'; // For MethodChannel
-import 'dart:io'; // For Directory
+import 'package:flutter/foundation.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:path/path.dart' as path;
 
 class Downloader {
-  static Future<bool> requestPermission() async {
-    // Request storage permission
-    final status = await Permission.storage.request();
-    return status.isGranted;
-  }
-
-  static Future<String?> downloadMedia(String url) async {
+  /// Downloads media from URL and saves it to the gallery
+  static Future<String?> downloadMedia(String url, {String mediaType = ''}) async {
     try {
-      // Check if permission is granted
-      if (!await requestPermission()) {
-        print('Permission denied'); // Debug log
-        return null; // Permission denied
+      print('Downloading from URL: $url');
+
+      // Download file
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) {
+        print('Failed to download: HTTP ${response.statusCode}');
+        return null;
       }
 
-      // Get the external storage directory
-      final directory = await getExternalStorageDirectory();
-      if (directory == null) {
-        print('Unable to access storage directory'); // Debug log
-        return null; // Unable to access storage
+      print('Downloaded ${response.bodyBytes.length} bytes');
+
+      // Create a temporary file first
+      final tempDir = await getTemporaryDirectory();
+      final fileExtension = mediaType.contains('video') ? '.mp4' : '.jpg';
+      final fileName = 'pinterest_${DateTime.now().millisecondsSinceEpoch}$fileExtension';
+      final file = File('${tempDir.path}/$fileName');
+      await file.writeAsBytes(response.bodyBytes);
+
+      print('Temporary file saved to: ${file.path}');
+
+      // Use gallery_saver to save to the gallery
+      try {
+        bool? success;
+        if (mediaType.contains('video')) {
+          success = await GallerySaver.saveVideo(file.path);
+        } else {
+          success = await GallerySaver.saveImage(file.path);
+        }
+
+        print('GallerySaver result: $success');
+
+        if (success == true) {
+          return 'Gallery';
+        }
+      } catch (e) {
+        print('Error with GallerySaver: $e');
       }
 
-      // Create a subdirectory named "Pinterest Downloads"
-      final saveDir = '${directory.path}/Pinterest Downloads';
-      final dir = Directory(saveDir);
-      if (!await dir.exists()) {
-        await dir.create(recursive: true); // Create the directory if it doesn't exist
-      }
+      // If gallery_saver fails, return the temp path.
+      return file.path;
 
-      // Create a file name from the URL
-      final fileName = url.split('/').last;
-      final savePath = '$saveDir/$fileName';
-
-      print('Downloading media from URL: $url'); // Debug log
-      print('Saving media to: $savePath'); // Debug log
-
-      // Download the file using Dio
-      final dio = Dio();
-      await dio.download(url, savePath);
-
-      // Notify the Media Scanner about the new file
-      await _notifyMediaScanner(savePath);
-
-      print('Media downloaded successfully'); // Debug log
-      return savePath;
     } catch (e) {
-      print('Error downloading media: $e'); // Debug log
+      print('Error in downloadMedia: $e');
       return null;
-    }
-  }
-
-  static Future<void> _notifyMediaScanner(String filePath) async {
-    try {
-      // Notify the Media Scanner about the new file
-      const channel = MethodChannel('flutter.io/mediaScanner');
-      await channel.invokeMethod('scanFile', {'path': filePath});
-      print('Media Scanner notified about the new file'); // Debug log
-    } catch (e) {
-      print('Error notifying Media Scanner: $e'); // Debug log
     }
   }
 }
