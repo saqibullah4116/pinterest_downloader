@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart'; 
 import 'utils/constants.dart'; 
 import 'screens/home_screen.dart'; 
-import 'utils/download_provider.dart'; 
+import 'provider/download_provider.dart'; 
 
 void main() {
   runApp(
