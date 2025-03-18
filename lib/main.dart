@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; 
-import 'utils/constants.dart'; 
-import 'screens/home_screen.dart'; 
-import 'provider/download_provider.dart'; 
+import 'package:provider/provider.dart';
+import 'utils/constants.dart';
+import 'screens/home_screen.dart';
+import 'provider/preview_provider.dart';
+import 'provider/download_provider.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => DownloadProvider(), 
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PreviewProvider()),
+        ChangeNotifierProvider(create: (context) => DownloadProvider()),
+      ],
       child: MyApp(),
     ),
   );
@@ -20,9 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: AppStrings.appName,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
+      theme: ThemeData(primarySwatch: Colors.red),
       home: Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -40,7 +42,9 @@ class MyApp extends StatelessWidget {
                 print('Selected language: $value');
               },
               itemBuilder: (BuildContext context) {
-                return {'English', 'Spanish', 'French', 'German'}.map((String choice) {
+                return {'English', 'Spanish', 'French', 'German'}.map((
+                  String choice,
+                ) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(choice),
