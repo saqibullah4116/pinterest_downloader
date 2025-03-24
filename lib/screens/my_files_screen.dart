@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:pinterest_downloader/components/VideoThumbnail.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
 
 class MyFilesScreen extends StatefulWidget {
   const MyFilesScreen({super.key});
@@ -18,17 +20,20 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
     _loadFiles();
   }
 
-  /// Fetches downloaded files
   Future<void> _loadFiles() async {
     final galleryDir = Directory('/storage/emulated/0/Pictures');
     if (galleryDir.existsSync()) {
       setState(() {
-        files = galleryDir.listSync().whereType<File>().toList();
+        files =
+            galleryDir
+                .listSync()
+                .whereType<File>()
+                .where((file) => file.existsSync())
+                .toList();
       });
     }
   }
 
-  /// Deletes a file from the app and gallery
   Future<void> _deleteFile(File file) async {
     try {
       if (await file.exists()) {
@@ -36,7 +41,6 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
         setState(() {
           files.removeWhere((element) => element.path == file.path);
         });
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("File deleted successfully!")),
         );
@@ -52,13 +56,10 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
     }
   }
 
-  /// Shares a file using `share_plus`
   Future<void> _shareFile(File file) async {
     try {
       if (await file.exists()) {
-        await Share.shareXFiles([
-          XFile(file.path),
-        ], text: "Check out this file!");
+        await Share.shareXFiles([XFile(file.path)], text: "Check this out!");
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("File not found! Cannot share.")),
@@ -71,6 +72,18 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
     }
   }
 
+  bool _isVideoFile(String path) {
+    final ext = path.toLowerCase().split('.').last;
+    return ['mp4', 'mov', 'avi', 'mkv'].contains(ext);
+  }
+
+  String _formatFileSize(int bytes) {
+    if (bytes <= 0) return "0 KB";
+    if (bytes < 1024) return "$bytes B";
+    if (bytes < 1048576) return "${(bytes / 1024).toStringAsFixed(1)} KB";
+    return "${(bytes / 1048576).toStringAsFixed(1)} MB";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,58 +92,126 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
           'My Files',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        elevation: 0,
       ),
       body:
           files.isEmpty
-              ? const Center(child: Text("No downloaded files found."))
-              : ListView.builder(
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.folder_open, size: 60, color: Colors.grey[400]),
+                    const SizedBox(height: 16),
+                    Text(
+                      "No files found",
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              )
+              : GridView.builder(
+                padding: const EdgeInsets.all(12),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.8,
+                ),
                 itemCount: files.length,
                 itemBuilder: (context, index) {
                   final file = File(files[index].path);
+                  final fileName = file.uri.pathSegments.last;
+                  final fileExt = fileName.split('.').last.toLowerCase();
 
-                  // Check if file still exists before displaying
-                  if (!file.existsSync()) {
-                    return const SizedBox(); // Skip this file
-                  }
 
-                  String fileSize = "Unknown";
+                  String fileDate = "Unknown date";
                   try {
-                    fileSize =
-                        "${(file.lengthSync() / 1024).toStringAsFixed(2)} KB";
+                    final lastModified = file.lastModifiedSync();
+                    fileDate = DateFormat(
+                      'MMM dd • hh:mm a',
+                    ).format(lastModified);
                   } catch (e) {
-                    fileSize = "Size unavailable";
+                    debugPrint("Error getting file date: $e");
                   }
 
-                  return ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        file,
-                        width: 50,
-                        height: 60,
-                        fit: BoxFit.cover,
-                        errorBuilder:
-                            (context, error, stackTrace) =>
-                                const Icon(Icons.image, size: 50),
-                      ),
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    title: Text(file.uri.pathSegments.last),
-                    subtitle: Text(fileSize),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.share),
-                          onPressed: () => _shareFile(file),
-                        ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {}, // Add file preview here
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
+                              ),
+                              child:
+                                  _isVideoFile(file.path)
+                                      ? VideoThumbnail(file: file)
+                                      : Image.file(
+                                        file,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                Container(
+                                                  color: Colors.grey[200],
+                                                  child: const Center(
+                                                    child: Icon(
+                                                      Icons.image,
+                                                      size: 40,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
+                                      ),
+                            ),
                           ),
-                          onPressed: () => _deleteFile(file),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fileName.length > 20
+                                      ? '${fileName.substring(0, 15)}...$fileExt'
+                                      : fileName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  maxLines: 1,
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _formatFileSize(file.lengthSync()),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      fileDate,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },

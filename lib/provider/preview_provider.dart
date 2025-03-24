@@ -23,7 +23,7 @@ class PreviewProvider with ChangeNotifier {
 
     try {
       final response = await _dio.get(
-        'https://pinterest-downloader-backend-1.onrender.com/api/v1/pinterest/preview',
+        'http://52.66.246.164:6000/api/v1/pinterest/preview',
         queryParameters: {'url': url},
         options: Options(headers: {'Content-Type': 'application/json'}),
       );
