@@ -73,10 +73,11 @@ class DownloadProvider with ChangeNotifier {
     try {
       if (await requestPermission()) {
         final tempDir = await getTemporaryDirectory();
-        final filePath = '${tempDir.path}/downloaded_video.mp4';
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final filePath = '${tempDir.path}/downloaded_video_$timestamp.mp4';
 
         Response<ResponseBody> response = await _dio.post<ResponseBody>(
-          'https://pinterest-downloader-backend-1.onrender.com/api/v1/pinterest/download',
+          'http://52.66.246.164:6000/api/v1/pinterest/download',
           data: {'url': url},
           options: Options(responseType: ResponseType.stream),
         );
@@ -90,13 +91,13 @@ class DownloadProvider with ChangeNotifier {
           await fileSink.flush();
           await fileSink.close();
 
-          final moviesDir = Directory('/storage/emulated/0/Movies');
+          final moviesDir = Directory('/storage/emulated/0/Pictures');
           if (!moviesDir.existsSync()) {
             moviesDir.createSync(recursive: true);
           }
 
           final savedFile = await file.copy(
-            '${moviesDir.path}/downloaded_video.mp4',
+            '${moviesDir.path}/downloaded_video$timestamp.mp4',
           );
 
           _downloadStatus = savedFile.existsSync()
