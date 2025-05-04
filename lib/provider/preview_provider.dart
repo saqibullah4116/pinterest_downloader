@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PreviewProvider with ChangeNotifier {
-  bool _isFetchingPreview = false; 
+  bool _isFetchingPreview = false;
   String _previewStatus = '';
   String? _previewImageUrl;
   String? _mediaType;
@@ -22,28 +23,38 @@ class PreviewProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await _dio.get(
-        'http://52.66.246.164:6000/api/v1/pinterest/preview',
-        queryParameters: {'url': url},
-        options: Options(headers: {'Content-Type': 'application/json'}),
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token == null) {
+        _previewStatus = 'No token found!';
+        _isFetchingPreview = false;
+        notifyListeners();
+        return;
+      }
+
+      final formData = FormData.fromMap({'url': url});
+
+      final response = await _dio.post(
+        'https://pin.canvaapk.com/api/pin-search',
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data['success'] == true) {
-          _previewImageUrl = data['data']['previewImageUrl'];
-          _mediaType = data['data']['mediaType'];
-          _previewStatus = 'Preview fetched successfully!';
-        } else {
-          _previewStatus = 'Failed to fetch preview: ${data['message']}';
-        }
+      if (response.statusCode == 200 && response.data['status'] == 200) {
+        final data = response.data['data'];
+        _previewImageUrl = data['url'];
+        _mediaType = data['type'];
+        _previewStatus = 'Preview fetched successfully!';
       } else {
-        _previewStatus = 'Failed to fetch preview: ${response.statusMessage}';
+        _previewStatus = 'Failed to fetch preview.';
       }
-    } on DioException catch (e) {
-      _previewStatus = 'Error: ${e.message}';
     } catch (e) {
-      _previewStatus = 'Unexpected error: $e';
+      _previewStatus = 'Error: $e';
     } finally {
       _isFetchingPreview = false;
       notifyListeners();
