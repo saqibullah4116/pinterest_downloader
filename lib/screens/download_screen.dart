@@ -1,161 +1,123 @@
 import 'package:flutter/material.dart';
-import 'package:pinterest_downloader/components/media_preview.dart';
-import 'package:pinterest_downloader/provider/download_provider.dart';
 import 'package:provider/provider.dart';
-import '../utils/constants.dart';
-import '../provider/preview_provider.dart'; // For preview functionality
+import '../provider/preview_provider.dart';
+import '../provider/download_provider.dart';
 
-class DownloadScreen extends StatelessWidget {
+class DownloadScreen extends StatefulWidget {
   const DownloadScreen({super.key});
 
   @override
+  State<DownloadScreen> createState() => _DownloadScreenState();
+}
+
+class _DownloadScreenState extends State<DownloadScreen> {
+  final TextEditingController _urlController = TextEditingController();
+  bool _previewFetched = false;
+
+  void _handleFetchPreview() async {
+    final url = _urlController.text.trim();
+    if (url.isNotEmpty) {
+      await context.read<PreviewProvider>().fetchPreview(url);
+      final previewUrl = context.read<PreviewProvider>().previewImageUrl;
+      if (previewUrl != null) {
+        setState(() {
+          _previewFetched = true;
+        });
+      }
+    }
+  }
+
+  void _handleDownload() {
+    final previewProvider = context.read<PreviewProvider>();
+    final downloadProvider = context.read<DownloadProvider>();
+
+    downloadProvider.downloadFile(
+      _urlController.text.trim(),
+      previewProvider.mediaType ?? '',
+      previewProvider.previewImageUrl ?? '',
+    );
+  }
+
+  void _handleReset() {
+    _urlController.clear();
+    context.read<PreviewProvider>().resetPreview();
+    context.read<DownloadProvider>().downloadStatus;
+    setState(() {
+      _previewFetched = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextEditingController _urlController = TextEditingController();
-    final previewProvider = Provider.of<PreviewProvider>(context);
-    final downloadProvider = Provider.of<DownloadProvider>(context);
+    final previewProvider = context.watch<PreviewProvider>();
+    final downloadProvider = context.watch<DownloadProvider>();
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextField(
-              controller: _urlController,
-              decoration: InputDecoration(
-                hintText: AppStrings.enterUrlHint,
-                border: const OutlineInputBorder(),
+      child: Column(
+        children: [
+          TextField(
+            controller: _urlController,
+            decoration: const InputDecoration(
+              labelText: 'Paste Pinterest URL',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          if (!_previewFetched && !previewProvider.isFetchingPreview)
+            ElevatedButton(
+              onPressed: _handleFetchPreview,
+              child: const Text('Preview'),
+            ),
+
+          if (previewProvider.isFetchingPreview)
+            const CircularProgressIndicator(),
+
+          const SizedBox(height: 20),
+
+          if (_previewFetched && previewProvider.previewImageUrl != null)
+            Card(
+              elevation: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.network(previewProvider.previewImageUrl!),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Type: ${previewProvider.mediaType}',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: downloadProvider.isDownloading
+                        ? null
+                        : _handleDownload,
+                    child: downloadProvider.isDownloading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Download'),
+                  ),
+                  if (downloadProvider.downloadStatus.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(downloadProvider.downloadStatus),
+                    ),
+                  TextButton(
+                    onPressed: _handleReset,
+                    child: const Text('Reset'),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
-            if (previewProvider.previewStatus.isNotEmpty)
-              Text(
-                previewProvider.previewStatus,
-                style: TextStyle(
-                  color:
-                      previewProvider.previewStatus.contains('Error')
-                          ? Colors.red
-                          : Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            const SizedBox(height: 20),
-            if (previewProvider.previewImageUrl != null &&
-                previewProvider.mediaType != null)
-              MediaPreview(
-                mediaUrl: previewProvider.previewImageUrl!,
-                mediaType: previewProvider.mediaType!,
-              ),
-            const SizedBox(height: 20),
-            if (previewProvider.previewImageUrl == null)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed:
-                      previewProvider.isFetchingPreview
-                          ? null
-                          : () {
-                            final url = _urlController.text.trim();
-                            if (url.isNotEmpty) {
-                              previewProvider.fetchPreview(url);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please enter a valid URL'),
-                                ),
-                              );
-                            }
-                          },
-                  icon: const Icon(
-                    Icons.remove_red_eye,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Preview',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.pinterestRed,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                ),
-              ),
-            if (previewProvider.previewImageUrl != null)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed:
-                      downloadProvider.isDownloading
-                          ? null
-                          : () {
-                            final url = _urlController.text.trim();
-                            final previewUrl = previewProvider.previewImageUrl;
-                            final mediaType = previewProvider.mediaType ?? '';
-
-                            if (mediaType == 'image' &&
-                                previewUrl != null &&
-                                previewUrl.isNotEmpty) {
-                              // If it's an image, use previewUrl directly
-                              downloadProvider.downloadFile(
-                                previewUrl,
-                                mediaType,
-                                previewUrl,
-                              );
-                            } else if (url.isNotEmpty) {
-                              // Otherwise, use user-entered URL
-                              downloadProvider.downloadFile(
-                                url,
-                                mediaType,
-                                previewUrl ?? '',
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Please enter a valid URL or select an image',
-                                  ),
-                                ),
-                              );
-                            }
-                          },
-                  icon: const Icon(
-                    Icons.download,
-                    size: 25,
-                    color: Colors.white,
-                  ),
-                  label: const Text(
-                    'Download',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.pinterestRed,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                ),
-              ),
-
-            const SizedBox(height: 20),
-            if (downloadProvider.downloadStatus.isNotEmpty)
-              Text(
-                downloadProvider.downloadStatus,
-                style: TextStyle(
-                  color:
-                      downloadProvider.downloadStatus.contains('Error')
-                          ? Colors.red
-                          : Colors.green,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

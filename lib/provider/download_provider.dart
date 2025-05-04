@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pinterest_downloader/utils/permission_handler.dart';
 
 class DownloadProvider with ChangeNotifier {
@@ -72,14 +73,30 @@ class DownloadProvider with ChangeNotifier {
   Future<void> _requestAndSaveVideo(String url) async {
     try {
       if (await requestPermission()) {
+        final prefs = await SharedPreferences.getInstance();
+        final token = prefs.getString('auth_token');
+
+        if (token == null) {
+          _downloadStatus = 'No token found!';
+          notifyListeners();
+          return;
+        }
+
         final tempDir = await getTemporaryDirectory();
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final filePath = '${tempDir.path}/downloaded_video_$timestamp.mp4';
 
+        final formData = FormData.fromMap({'url': url});
+
         Response<ResponseBody> response = await _dio.post<ResponseBody>(
-          'http://52.66.246.164:6000/api/v1/pinterest/download',
-          data: {'url': url},
-          options: Options(responseType: ResponseType.stream),
+          'https://pin.canvaapk.com/api/pin-download',
+          data: formData,
+          options: Options(
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+            responseType: ResponseType.stream,
+          ),
         );
 
         if (response.statusCode == 200) {
@@ -87,7 +104,6 @@ class DownloadProvider with ChangeNotifier {
           IOSink fileSink = file.openWrite();
 
           await response.data!.stream.forEach((chunk) => fileSink.add(chunk));
-
           await fileSink.flush();
           await fileSink.close();
 
@@ -96,15 +112,13 @@ class DownloadProvider with ChangeNotifier {
             moviesDir.createSync(recursive: true);
           }
 
-          final savedFile = await file.copy(
-            '${moviesDir.path}/downloaded_video$timestamp.mp4',
-          );
+          final savedFile = await file.copy('${moviesDir.path}/downloaded_video_$timestamp.mp4');
 
           _downloadStatus = savedFile.existsSync()
               ? 'Video saved to Gallery!'
               : 'Failed to save video!';
         } else {
-          _downloadStatus = 'Failed to download video!';
+          _downloadStatus = 'Failed to download video! Status: ${response.statusCode}';
         }
       } else {
         _downloadStatus = 'Permission Denied!';
@@ -113,6 +127,4 @@ class DownloadProvider with ChangeNotifier {
       _downloadStatus = 'Error saving video: $e';
     }
   }
-
-
 }
