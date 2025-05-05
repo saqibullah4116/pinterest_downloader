@@ -12,7 +12,7 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('auth_token');
 
-    if (_token == null) {
+    // if (_token == null) {
       final response = await http.post(
         Uri.parse('https://pin.canvaapk.com/api/auth/token'),
         headers: {'x-api-key': 'JJHKHKHIUIJKNKNKNKNKNUIU4343453453'},
@@ -20,17 +20,12 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         _token = data['token'];
-        print("************************************");
-        print("************************************");
-        print("************************************");
-        print("yay i got the token");
-        print(_token);
         await prefs.setString('auth_token', _token!);
         notifyListeners();
       } else {
         throw Exception('Failed to fetch token');
       }
-    }
+    // }
   }
 
   Future<void> clearToken() async {

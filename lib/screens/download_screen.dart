@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../components/preview_bottom_sheet.dart';
 import '../provider/preview_provider.dart';
 import '../provider/download_provider.dart';
 
@@ -12,22 +14,46 @@ class DownloadScreen extends StatefulWidget {
 
 class _DownloadScreenState extends State<DownloadScreen> {
   final TextEditingController _urlController = TextEditingController();
-  bool _previewFetched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _urlController.addListener(_onUrlChanged);
+  }
+
+  @override
+  void dispose() {
+    _urlController.removeListener(_onUrlChanged);
+    _urlController.dispose();
+    super.dispose();
+  }
+
+  void _onUrlChanged() {
+    setState(() {}); // Ensures UI reflects latest URL value
+  }
 
   void _handleFetchPreview() async {
     final url = _urlController.text.trim();
-    if (url.isNotEmpty) {
-      await context.read<PreviewProvider>().fetchPreview(url);
-      final previewUrl = context.read<PreviewProvider>().previewImageUrl;
-      if (previewUrl != null) {
-        setState(() {
-          _previewFetched = true;
-        });
-      }
+    if (url.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please paste a valid Pinterest URL')),
+      );
+      return;
+    }
+
+    final previewProvider = context.read<PreviewProvider>();
+    await previewProvider.fetchPreview(url);
+
+    if (previewProvider.previewImageUrl != null && mounted) {
+      _showPreviewBottomSheet();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(previewProvider.previewStatus)),
+      );
     }
   }
 
-  void _handleDownload() {
+  void _handleDownload(BuildContext context) {
     final previewProvider = context.read<PreviewProvider>();
     final downloadProvider = context.read<DownloadProvider>();
 
@@ -42,82 +68,99 @@ class _DownloadScreenState extends State<DownloadScreen> {
     _urlController.clear();
     context.read<PreviewProvider>().resetPreview();
     context.read<DownloadProvider>().downloadStatus;
-    setState(() {
-      _previewFetched = false;
-    });
+  }
+
+  void _showPreviewBottomSheet() {
+    final previewProvider = context.read<PreviewProvider>();
+    final downloadProvider = context.read<DownloadProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      isScrollControlled: false,
+      builder: (_) {
+        return PreviewBottomSheet(
+          imageUrl: previewProvider.previewImageUrl ?? '',
+          mediaSize: previewProvider.mediaSize ?? 'Unknown Size',
+          mediaType: previewProvider.mediaType ?? 'Unknown Type',
+          isDownloading: downloadProvider.isDownloading,
+          onDownload: () => _handleDownload(context),
+          onReset: _handleReset,
+          downloadStatus: downloadProvider.downloadStatus,
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final previewProvider = context.watch<PreviewProvider>();
-    final downloadProvider = context.watch<DownloadProvider>();
+    final isUrlNotEmpty = _urlController.text.trim().isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          TextField(
-            controller: _urlController,
-            decoration: const InputDecoration(
-              labelText: 'Paste Pinterest URL',
-              border: OutlineInputBorder(),
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _urlController,
+              decoration: InputDecoration(
+                labelText: 'Paste Pinterest URL',
+                hintText: 'https://www.pinterest.com/pin/...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.link),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.paste),
+                  tooltip: 'Paste from clipboard',
+                  onPressed: () async {
+                    final clipboardData =
+                        await Clipboard.getData('text/plain');
+                    if (clipboardData != null && clipboardData.text != null) {
+                      _urlController.text = clipboardData.text!;
+                    }
+                  },
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+              keyboardType: TextInputType.url,
+              textInputAction: TextInputAction.done,
             ),
-          ),
-          const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-          if (!_previewFetched && !previewProvider.isFetchingPreview)
-            ElevatedButton(
-              onPressed: _handleFetchPreview,
-              child: const Text('Preview'),
-            ),
+            if (!previewProvider.isFetchingPreview)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: isUrlNotEmpty ? _handleFetchPreview : null,
+                  icon: const Icon(Icons.remove_red_eye),
+                  label: const Text('Preview'),
+                ),
+              ),
 
-          if (previewProvider.isFetchingPreview)
-            const CircularProgressIndicator(),
+            if (previewProvider.isFetchingPreview)
+              const Center(child: CircularProgressIndicator()),
 
-          const SizedBox(height: 20),
-
-          if (_previewFetched && previewProvider.previewImageUrl != null)
-            Card(
-              elevation: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.network(previewProvider.previewImageUrl!),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      'Type: ${previewProvider.mediaType}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: downloadProvider.isDownloading
-                        ? null
-                        : _handleDownload,
-                    child: downloadProvider.isDownloading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('Download'),
-                  ),
-                  if (downloadProvider.downloadStatus.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(downloadProvider.downloadStatus),
-                    ),
-                  TextButton(
-                    onPressed: _handleReset,
-                    child: const Text('Reset'),
-                  ),
-                ],
+            const SizedBox(height: 30),
+            Container(
+              height: 100,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: const Text(
+                'Ad Banner Placeholder',
+                style: TextStyle(color: Colors.black54),
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }
