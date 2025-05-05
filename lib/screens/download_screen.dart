@@ -29,7 +29,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
   }
 
   void _onUrlChanged() {
-    setState(() {}); // Ensures UI reflects latest URL value
+    setState(() {});
   }
 
   void _handleFetchPreview() async {
@@ -53,15 +53,25 @@ class _DownloadScreenState extends State<DownloadScreen> {
     }
   }
 
-  void _handleDownload(BuildContext context) {
+  Future<void> _handleDownload(BuildContext bottomSheetContext) async {
     final previewProvider = context.read<PreviewProvider>();
     final downloadProvider = context.read<DownloadProvider>();
 
-    downloadProvider.downloadFile(
+    await downloadProvider.downloadFile(
       _urlController.text.trim(),
       previewProvider.mediaType ?? '',
       previewProvider.previewImageUrl ?? '',
     );
+
+    final message = downloadProvider.downloadStatus;
+
+    if (mounted) {
+      Navigator.of(bottomSheetContext).pop(); // Close bottom sheet
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+     _handleReset();
   }
 
   void _handleReset() {
@@ -80,13 +90,13 @@ class _DownloadScreenState extends State<DownloadScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       isScrollControlled: false,
-      builder: (_) {
+      builder: (bottomSheetContext) {
         return PreviewBottomSheet(
           imageUrl: previewProvider.previewImageUrl ?? '',
           mediaSize: previewProvider.mediaSize ?? 'Unknown Size',
           mediaType: previewProvider.mediaType ?? 'Unknown Type',
           isDownloading: downloadProvider.isDownloading,
-          onDownload: () => _handleDownload(context),
+          onDownload: () => _handleDownload(bottomSheetContext),
           onReset: _handleReset,
           downloadStatus: downloadProvider.downloadStatus,
         );
