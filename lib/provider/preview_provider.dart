@@ -7,11 +7,13 @@ class PreviewProvider with ChangeNotifier {
   String _previewStatus = '';
   String? _previewImageUrl;
   String? _mediaType;
+  String? _mediaSize;
 
   bool get isFetchingPreview => _isFetchingPreview;
   String get previewStatus => _previewStatus;
   String? get previewImageUrl => _previewImageUrl;
   String? get mediaType => _mediaType;
+  String? get mediaSize => _mediaSize;
 
   final Dio _dio = Dio();
 
@@ -20,6 +22,7 @@ class PreviewProvider with ChangeNotifier {
     _previewStatus = 'Fetching preview...';
     _previewImageUrl = null;
     _mediaType = null;
+    _mediaSize = null;
     notifyListeners();
 
     try {
@@ -38,17 +41,15 @@ class PreviewProvider with ChangeNotifier {
       final response = await _dio.post(
         'https://pin.canvaapk.com/api/pin-search',
         data: formData,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
       if (response.statusCode == 200 && response.data['status'] == 200) {
+        
         final data = response.data['data'];
         _previewImageUrl = data['url'];
         _mediaType = data['type'];
+        _mediaSize = data['size'];
         _previewStatus = 'Preview fetched successfully!';
       } else {
         _previewStatus = 'Failed to fetch preview.';
@@ -66,6 +67,7 @@ class PreviewProvider with ChangeNotifier {
     _previewStatus = '';
     _previewImageUrl = null;
     _mediaType = null;
+    _mediaSize = null;
     notifyListeners();
   }
 }
