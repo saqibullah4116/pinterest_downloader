@@ -47,9 +47,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
     if (previewProvider.previewImageUrl != null && mounted) {
       _showPreviewBottomSheet();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(previewProvider.previewStatus)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(previewProvider.previewStatus)));
     }
   }
 
@@ -67,11 +67,11 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
     if (mounted) {
       Navigator.of(bottomSheetContext).pop(); // Close bottom sheet
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
-     _handleReset();
+    _handleReset();
   }
 
   void _handleReset() {
@@ -119,27 +119,53 @@ class _DownloadScreenState extends State<DownloadScreen> {
               decoration: InputDecoration(
                 labelText: 'Paste Pinterest URL',
                 hintText: 'https://www.pinterest.com/pin/...',
+                labelStyle: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                prefixIcon: const Icon(Icons.link),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.primary.withOpacity(0.5),
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                prefixIcon: Icon(
+                  Icons.link,
+                  color: Theme.of(context).iconTheme.color,
+                ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste),
                   tooltip: 'Paste from clipboard',
+                  color: Theme.of(context).iconTheme.color,
                   onPressed: () async {
-                    final clipboardData =
-                        await Clipboard.getData('text/plain');
+                    final clipboardData = await Clipboard.getData('text/plain');
                     if (clipboardData != null && clipboardData.text != null) {
                       _urlController.text = clipboardData.text!;
                     }
                   },
                 ),
                 filled: true,
-                fillColor: Colors.grey[100],
+                fillColor: Theme.of(
+                  context,
+                ).colorScheme.surface.withOpacity(0.05),
               ),
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.done,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
+
             const SizedBox(height: 16),
 
             if (!previewProvider.isFetchingPreview)
