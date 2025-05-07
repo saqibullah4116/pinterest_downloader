@@ -8,7 +8,6 @@ import 'screens/home_screen.dart';
 import 'provider/preview_provider.dart';
 import 'provider/download_provider.dart';
 
-
 void main() {
   runApp(
     MultiProvider(
@@ -17,7 +16,6 @@ void main() {
         ChangeNotifierProvider(create: (context) => DownloadProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
-
       ],
       child: MyApp(),
     ),
@@ -30,20 +28,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    
+
     // Show loading indicator while theme is loading
     if (!themeProvider.isLoaded) {
       return MaterialApp(
         home: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(
-              color: Colors.red,
-            ),
-          ),
+          body: Center(child: CircularProgressIndicator(color: Colors.red)),
         ),
       );
     }
-    
+
     return MaterialApp(
       title: AppStrings.appName,
       theme: themeProvider.themeData,
@@ -59,7 +53,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkTheme = themeProvider.themeData.brightness == Brightness.dark;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(

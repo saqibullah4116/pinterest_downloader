@@ -12,13 +12,42 @@ class AppTheme {
 
 // Class to define all our themes
 class AppThemes {
-  // Light theme
+  static final pinterest = AppTheme(
+    name: 'Pinterest',
+    themeData: ThemeData(
+      brightness: Brightness.light,
+      primaryColor: const Color(0xFFE60023),
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFFE60023),
+        secondary: Color(0xFFBD081C),
+        surface: Colors.white,
+        background: Color(0xFFF8F8F8),
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        onSurface: Colors.black87,
+        onBackground: Colors.black87,
+      ),
+      scaffoldBackgroundColor: const Color(0xFFF8F8F8),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFFE60023),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      cardTheme: CardTheme(
+        color: Colors.white,
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      iconTheme: const IconThemeData(color: Color(0xFFE60023)),
+    ),
+  );
+
   static final light = AppTheme(
     name: 'Light',
     themeData: ThemeData(
       brightness: Brightness.light,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.light(
+      primaryColor: const Color(0xFFF5F5F5),
+      colorScheme: const ColorScheme.light(
         primary: Colors.red,
         secondary: Colors.blue,
         surface: Colors.white,
@@ -28,8 +57,8 @@ class AppThemes {
         onSurface: Colors.black,
         onBackground: Colors.black,
       ),
-      scaffoldBackgroundColor: Color(0xFFF5F5F5),
-      appBarTheme: AppBarTheme(
+      scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -37,29 +66,18 @@ class AppThemes {
       cardTheme: CardTheme(
         color: Colors.white,
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Colors.black87),
-        bodyLarge: TextStyle(color: Colors.black87),
-        bodyMedium: TextStyle(color: Colors.black54),
-      ),
+      iconTheme: const IconThemeData(color: Colors.red),
     ),
   );
 
-  // Dark theme
   static final dark = AppTheme(
     name: 'Dark',
     themeData: ThemeData(
       brightness: Brightness.dark,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.dark(
+      primaryColor: const Color(0xFF121212),
+      colorScheme: const ColorScheme.dark(
         primary: Colors.red,
         secondary: Colors.blue,
         surface: Color(0xFF303030),
@@ -69,39 +87,28 @@ class AppThemes {
         onSurface: Colors.white,
         onBackground: Colors.white,
       ),
-      scaffoldBackgroundColor: Color(0xFF121212),
-      appBarTheme: AppBarTheme(
+      scaffoldBackgroundColor: const Color(0xFF121212),
+      appBarTheme: const AppBarTheme(
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardTheme(
-        color: Color(0xFF303030),
+        color: const Color(0xFF303030),
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Colors.white),
-        bodyLarge: TextStyle(color: Colors.white),
-        bodyMedium: TextStyle(color: Colors.white70),
-      ),
+      iconTheme: const IconThemeData(color: Colors.red),
     ),
   );
 
-  // Midnight Blue theme
   static final midnight = AppTheme(
     name: 'Midnight Blue',
     themeData: ThemeData(
       brightness: Brightness.dark,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.dark(
-        primary: Colors.red,
+      primaryColor: const Color(0xFF172B4D),
+      colorScheme: const ColorScheme.dark(
+        primary: Color(0xFF172B4D),
         secondary: Colors.lightBlue,
         surface: Color(0xFF253858),
         background: Color(0xFF172B4D),
@@ -110,40 +117,29 @@ class AppThemes {
         onSurface: Colors.white,
         onBackground: Colors.white,
       ),
-      scaffoldBackgroundColor: Color(0xFF172B4D),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.red,
+      scaffoldBackgroundColor: const Color(0xFF172B4D),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF172B4D),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardTheme(
-        color: Color(0xFF253858),
+        color: const Color(0xFF253858),
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Colors.white),
-        bodyLarge: TextStyle(color: Colors.white),
-        bodyMedium: TextStyle(color: Colors.white70),
-      ),
+      iconTheme: const IconThemeData(color: Colors.red),
     ),
   );
 
-  // Nature theme
   static final nature = AppTheme(
     name: 'Nature',
     themeData: ThemeData(
       brightness: Brightness.light,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.light(
-        primary: Colors.red,
-        secondary: Color(0xFF2E7D32),
+      primaryColor: const Color(0xFF2E7D32),
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF2E7D32),
+        secondary: Color(0xFF558B2F),
         surface: Color(0xFFDCEDC8),
         background: Color(0xFFF1F8E9),
         onPrimary: Colors.white,
@@ -151,40 +147,29 @@ class AppThemes {
         onSurface: Color(0xFF33691E),
         onBackground: Color(0xFF33691E),
       ),
-      scaffoldBackgroundColor: Color(0xFFF1F8E9),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.red,
+      scaffoldBackgroundColor: const Color(0xFFF1F8E9),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF2E7D32),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardTheme(
-        color: Color(0xFFDCEDC8),
+        color: const Color(0xFFDCEDC8),
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Color(0xFF33691E), fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Color(0xFF33691E)),
-        bodyLarge: TextStyle(color: Color(0xFF33691E)),
-        bodyMedium: TextStyle(color: Color(0xFF558B2F)),
-      ),
+      iconTheme: const IconThemeData(color: Color(0xFF2E7D32)),
     ),
   );
 
-  // Sunset theme
   static final sunset = AppTheme(
     name: 'Sunset',
     themeData: ThemeData(
       brightness: Brightness.light,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.light(
-        primary: Colors.red,
-        secondary: Color(0xFFFF6F00),
+      primaryColor: const Color(0xFFFF6F00),
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFFFF6F00),
+        secondary: Color(0xFFFFA000),
         surface: Color(0xFFFFF8E1),
         background: Color(0xFFFFF3E0),
         onPrimary: Colors.white,
@@ -192,74 +177,53 @@ class AppThemes {
         onSurface: Color(0xFF4E342E),
         onBackground: Color(0xFF4E342E),
       ),
-      scaffoldBackgroundColor: Color(0xFFFFF3E0),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.red,
+      scaffoldBackgroundColor: const Color(0xFFFFF3E0),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFFFF6F00),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardTheme(
-        color: Color(0xFFFFF8E1),
+        color: const Color(0xFFFFF8E1),
         elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Color(0xFF4E342E), fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Color(0xFF4E342E)),
-        bodyLarge: TextStyle(color: Color(0xFF4E342E)),
-        bodyMedium: TextStyle(color: Color(0xFF795548)),
-      ),
+      iconTheme: const IconThemeData(color: Color(0xFFFF6F00)),
     ),
   );
 
-  // Purple Haze theme
   static final purpleHaze = AppTheme(
     name: 'Purple Haze',
     themeData: ThemeData(
       brightness: Brightness.dark,
-      primaryColor: Colors.red,
-      colorScheme: ColorScheme.dark(
-        primary: Colors.red,
-        secondary: Color(0xFF9C27B0),
-        surface: Color(0xFF4A148C),
-        background: Color(0xFF311B92),
+      primaryColor: const Color(0xFFAB47BC),
+      colorScheme: const ColorScheme.dark(
+        primary: Color(0xFFAB47BC),
+        secondary: Color(0xFFCE93D8),
+        surface: Color(0xFF5E35B1),
+        background: Color(0xFF4527A0),
         onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onSecondary: Colors.black,
         onSurface: Colors.white,
         onBackground: Colors.white,
       ),
-      scaffoldBackgroundColor: Color(0xFF311B92),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Colors.red,
+      scaffoldBackgroundColor: const Color(0xFF4527A0),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF7E57C2),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardTheme(
-        color: Color(0xFF4A148C),
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        color: const Color(0xFF673AB7),
+        elevation: 3,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      iconTheme: IconThemeData(
-        color: Colors.red,
-      ),
-      textTheme: TextTheme(
-        titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        titleMedium: TextStyle(color: Colors.white),
-        bodyLarge: TextStyle(color: Colors.white),
-        bodyMedium: TextStyle(color: Colors.white70),
-      ),
+      iconTheme: const IconThemeData(color: Color(0xFFCE93D8)),
     ),
   );
 
-  // All themes list
-  static final List<AppTheme> availableThemes = [
+  static final List<AppTheme> all = [
+    pinterest,
     light,
     dark,
     midnight,
