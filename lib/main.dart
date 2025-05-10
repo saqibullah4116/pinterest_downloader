@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'utils/constants.dart';
 import 'screens/home_screen.dart';
+import 'screens/language_setup_screen.dart';
 import 'provider/preview_provider.dart';
 import 'provider/download_provider.dart';
 
@@ -33,7 +34,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    // Show loading indicator while theme is loading
     if (!themeProvider.isLoaded) {
       return MaterialApp(
         home: Scaffold(
@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
           title: AppStrings.appName,
           theme: themeProvider.themeData,
           locale: languageProvider.locale,
-          supportedLocales: [
+          supportedLocales: const [
             Locale('en'),
             Locale('ur'),
             Locale('fr'),
@@ -61,7 +61,9 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: MyHomePage(),
+          home: languageProvider.isLanguageChosen
+              ? const MyHomePage()
+              : const LanguageSetupScreen(),
         );
       },
     );
@@ -98,43 +100,43 @@ class MyHomePage extends StatelessWidget {
           },
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: Icon(
-              Icons.language,
-              color: isDarkTheme ? Colors.white : AppColors.pinterestBlack,
-            ),
-            onSelected: (String value) {
-              final languageProvider = Provider.of<LanguageProvider>(
-                context,
-                listen: false,
+          Consumer<LanguageProvider>(
+            builder: (context, languageProvider, _) {
+              final langCode = languageProvider.locale.languageCode;
+
+              final flagMap = {
+                'en': '🇺🇸',
+                'ur': '🇵🇰',
+                'fr': '🇫🇷',
+                'hi': '🇮🇳',
+                'bn': '🇧🇩',
+              };
+
+              return PopupMenuButton<String>(
+                icon: Text(
+                  flagMap[langCode] ?? '🌐',
+                  style: const TextStyle(fontSize: 24),
+                ),
+                onSelected: (String code) {
+                  languageProvider.setLocale(Locale(code));
+                },
+                itemBuilder: (BuildContext context) {
+                  final languageOptions = {
+                    'en': '🇺🇸 English',
+                    'ur': '🇵🇰 Urdu',
+                    'fr': '🇫🇷 French',
+                    'hi': '🇮🇳 Hindi',
+                    'bn': '🇧🇩 Bangla',
+                  };
+
+                  return languageOptions.entries.map((entry) {
+                    return PopupMenuItem<String>(
+                      value: entry.key,
+                      child: Text(entry.value),
+                    );
+                  }).toList();
+                },
               );
-              switch (value) {
-                case 'Urdu':
-                  languageProvider.setLocale(const Locale('ur'));
-                  break;
-                case 'French':
-                  languageProvider.setLocale(const Locale('fr'));
-                  break;
-                case 'Hindi':
-                  languageProvider.setLocale(const Locale('hi'));
-                  break;
-                case 'Bangla':
-                  languageProvider.setLocale(const Locale('bn'));
-                  break;
-                case 'English':
-                default:
-                  languageProvider.setLocale(const Locale('en'));
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return {'English', 'Urdu', 'French', 'Hindi', 'Bangla'}.map((
-                String choice,
-              ) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
             },
           ),
         ],

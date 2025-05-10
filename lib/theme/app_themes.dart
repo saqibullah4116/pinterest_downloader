@@ -49,7 +49,7 @@ class AppThemes {
       primaryColor: const Color(0xFFF5F5F5),
       colorScheme: const ColorScheme.light(
         primary: Colors.red,
-        secondary: Colors.blue,
+        secondary: Color.fromARGB(255, 219, 83, 73),
         surface: Colors.white,
         background: Color(0xFFF5F5F5),
         onPrimary: Colors.white,
@@ -79,7 +79,7 @@ class AppThemes {
       primaryColor: const Color(0xFF121212),
       colorScheme: const ColorScheme.dark(
         primary: Colors.red,
-        secondary: Colors.blue,
+        secondary: Color.fromARGB(255, 240, 83, 72),
         surface: Color(0xFF303030),
         background: Color(0xFF121212),
         onPrimary: Colors.white,
@@ -108,7 +108,7 @@ class AppThemes {
       brightness: Brightness.dark,
       primaryColor: const Color(0xFF172B4D),
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF172B4D),
+        primary: Colors.red,
         secondary: Colors.lightBlue,
         surface: Color(0xFF253858),
         background: Color(0xFF172B4D),
@@ -200,14 +200,14 @@ class AppThemes {
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFFAB47BC),
         secondary: Color(0xFFCE93D8),
-        surface: Color(0xFF5E35B1),
-        background: Color(0xFF4527A0),
+        surface: Color.fromARGB(255, 105, 69, 179),
+        background: Color.fromARGB(255, 95, 72, 165),
         onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: Colors.white,
         onBackground: Colors.white,
       ),
-      scaffoldBackgroundColor: const Color(0xFF4527A0),
+      scaffoldBackgroundColor: const Color.fromARGB(255, 88, 64, 160),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF7E57C2),
         foregroundColor: Colors.white,
