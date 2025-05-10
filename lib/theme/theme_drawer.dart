@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pinterest_downloader/theme/theme_name_localizer.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:provider/provider.dart';
 import '../provider/theme_provider.dart';
 
@@ -29,8 +32,8 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
               children: [
                 const Icon(Icons.color_lens, size: 48, color: Colors.white),
                 const SizedBox(height: 12),
-                const Text(
-                  'Theme Options',
+                Text(
+                  AppLocalizations.of(context).themeOptions,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -39,7 +42,9 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Current: ${currentTheme.name}',
+                  AppLocalizations.of(context).currentTheme(
+                    getLocalizedThemeName(context, currentTheme.name),
+                  ),
                   style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
@@ -48,7 +53,7 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
 
           // Expandable Theme List
           ExpansionTile(
-            title: const Text('Select Theme'),
+            title: Text(AppLocalizations.of(context).selectTheme),
             leading: const Icon(Icons.palette),
             initiallyExpanded: _isThemeExpanded,
             onExpansionChanged:
@@ -66,10 +71,7 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.amber,
-                          width: 2,
-                        ),
+                        border: Border.all(color: Colors.amber, width: 2),
                       ),
                       child: CircleAvatar(
                         backgroundColor: theme.themeData.primaryColor,
@@ -84,13 +86,15 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
                     ),
 
                     title: Text(
-                      theme.name,
+                      getLocalizedThemeName(context, theme.name),
                       style: TextStyle(
                         color: themeProvider.themeData.colorScheme.onSurface,
                       ),
                     ),
                     subtitle: Text(
-                      isDark ? 'Dark theme' : 'Light theme',
+                      isDark
+                          ? AppLocalizations.of(context).darkTheme
+                          : AppLocalizations.of(context).lightTheme,
                       style: TextStyle(
                         color: themeProvider.themeData.colorScheme.onSurface
                             .withOpacity(0.6),
@@ -109,23 +113,23 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
 
           ListTile(
             leading: const Icon(Icons.article),
-            title: const Text('Privacy Policy'),
+            title: Text(AppLocalizations.of(context).privacyPolicy),
             onTap: () {
               // Navigate to Privacy Policy
             },
           ),
           ListTile(
             leading: const Icon(Icons.info),
-            title: const Text('About Us'),
+            title: Text(AppLocalizations.of(context).aboutUs),
             onTap: () {
               // Navigate to About Us
             },
           ),
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Select your preferred theme style',
+              AppLocalizations.of(context).selectThemeStyle,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),

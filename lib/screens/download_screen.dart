@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../components/preview_bottom_sheet.dart';
 import '../provider/preview_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../provider/download_provider.dart';
 
 class DownloadScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please paste a valid Pinterest URL')),
+        SnackBar(content: Text( AppLocalizations.of(context).pastePinterestUrl)),
       );
       return;
     }
@@ -117,7 +118,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
             TextField(
               controller: _urlController,
               decoration: InputDecoration(
-                labelText: 'Paste Pinterest URL',
+                labelText: AppLocalizations.of(context).pastePinterestUrl,
                 hintText: 'https://www.pinterest.com/pin/...',
                 labelStyle: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
@@ -174,7 +175,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 child: ElevatedButton.icon(
                   onPressed: isUrlNotEmpty ? _handleFetchPreview : null,
                   icon: const Icon(Icons.remove_red_eye),
-                  label: const Text('Preview'),
+                  label: Text(AppLocalizations.of(context).preview),
                 ),
               ),
 
@@ -190,8 +191,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 borderRadius: BorderRadius.circular(12),
               ),
               alignment: Alignment.center,
-              child: const Text(
-                'Ad Banner Placeholder',
+              child: Text(
+                AppLocalizations.of(context).adPlaceholder,
                 style: TextStyle(color: Colors.black54),
               ),
             ),
