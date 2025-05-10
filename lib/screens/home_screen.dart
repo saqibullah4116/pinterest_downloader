@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinterest_downloader/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart';
 import 'download_screen.dart';
@@ -24,16 +25,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkTheme = themeProvider.themeData.brightness == Brightness.dark;
+    final theme = Theme.of(context);
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.colorScheme.surface,
           toolbarHeight: 0,
           bottom: TabBar(
             indicatorColor: AppColors.pinterestRed,
-            labelColor: AppColors.pinterestRed,
-            unselectedLabelColor: AppColors.pinterestBlack,
+            labelColor: theme.colorScheme.primary,
+            unselectedLabelColor: isDarkTheme ? Colors.white : AppColors.pinterestBlack,
             labelStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16.0,
@@ -44,7 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             indicator: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: AppColors.pinterestRed, width: 4.0),
+                bottom: BorderSide(
+                  color: theme.colorScheme.secondary,
+                  width: 4.0,
+                ),
               ),
             ),
             indicatorSize: TabBarIndicatorSize.tab,

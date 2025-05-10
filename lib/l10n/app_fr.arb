@@ -20,5 +20,6 @@
   "myFiles": "Mes fichiers",
   "pastePinterestUrl": "Coller l'URL Pinterest",
   "preview": "Aperçu",
-  "adPlaceholder": "Espace publicitaire"
+  "adPlaceholder": "Espace publicitaire",
+  "reset": "Réinitialiser"
 }

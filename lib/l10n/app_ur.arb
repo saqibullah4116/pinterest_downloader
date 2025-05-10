@@ -16,9 +16,11 @@
   "privacyPolicy": "رازداری کی پالیسی",
   "aboutUs": "ہمارے بارے میں",
   "selectThemeStyle": "اپنی پسندیدہ تھیم اسٹائل منتخب کریں",
-    "download": "ڈاؤن لوڈ",
+  "download": "ڈاؤن لوڈ",
   "myFiles": "میری فائلیں",
   "pastePinterestUrl": "Pinterest URL چسپاں کریں",
   "preview": "پیش نظارہ",
-  "adPlaceholder": "اشتہار بینر پلیس ہولڈر"
+  "adPlaceholder": "اشتہار بینر پلیس ہولڈر",
+  "reset": "ری سیٹ کریں"
+
 }
