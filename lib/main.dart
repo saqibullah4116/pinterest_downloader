@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pinterest_downloader/provider/auth_provider.dart';
+import 'package:pinterest_downloader/provider/language_provider.dart';
 import 'package:pinterest_downloader/provider/theme_provider.dart';
 import 'package:pinterest_downloader/theme/theme_drawer.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'utils/constants.dart';
 import 'screens/home_screen.dart';
@@ -16,6 +19,7 @@ void main() {
         ChangeNotifierProvider(create: (context) => DownloadProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => LanguageProvider()),
       ],
       child: MyApp(),
     ),
@@ -38,10 +42,28 @@ class MyApp extends StatelessWidget {
       );
     }
 
-    return MaterialApp(
-      title: AppStrings.appName,
-      theme: themeProvider.themeData,
-      home: MyHomePage(),
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, _) {
+        return MaterialApp(
+          title: AppStrings.appName,
+          theme: themeProvider.themeData,
+          locale: languageProvider.locale,
+          supportedLocales: [
+            Locale('en'),
+            Locale('ur'),
+            Locale('fr'),
+            Locale('hi'),
+            Locale('bn'),
+          ],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: MyHomePage(),
+        );
+      },
     );
   }
 }
@@ -57,7 +79,7 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppStrings.appName,
+          AppLocalizations.of(context).appTitle,
           style: TextStyle(
             color: isDarkTheme ? Colors.white : AppColors.pinterestBlack,
           ),
@@ -82,10 +104,30 @@ class MyHomePage extends StatelessWidget {
               color: isDarkTheme ? Colors.white : AppColors.pinterestBlack,
             ),
             onSelected: (String value) {
-              print('Selected language: $value');
+              final languageProvider = Provider.of<LanguageProvider>(
+                context,
+                listen: false,
+              );
+              switch (value) {
+                case 'Urdu':
+                  languageProvider.setLocale(const Locale('ur'));
+                  break;
+                case 'French':
+                  languageProvider.setLocale(const Locale('fr'));
+                  break;
+                case 'Hindi':
+                  languageProvider.setLocale(const Locale('hi'));
+                  break;
+                case 'Bangla':
+                  languageProvider.setLocale(const Locale('bn'));
+                  break;
+                case 'English':
+                default:
+                  languageProvider.setLocale(const Locale('en'));
+              }
             },
             itemBuilder: (BuildContext context) {
-              return {'English', 'Spanish', 'French', 'German'}.map((
+              return {'English', 'Urdu', 'French', 'Hindi', 'Bangla'}.map((
                 String choice,
               ) {
                 return PopupMenuItem<String>(
