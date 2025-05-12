@@ -54,6 +54,11 @@ class MyApp extends StatelessWidget {
             Locale('fr'),
             Locale('hi'),
             Locale('bn'),
+            Locale('es'),
+            Locale('de'),
+            Locale('tr'),
+            Locale('pt'),
+            Locale('id'),
           ],
           localizationsDelegates: const [
             AppLocalizations.delegate,
@@ -61,9 +66,10 @@ class MyApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: languageProvider.isLanguageChosen
-              ? const MyHomePage()
-              : const LanguageSetupScreen(),
+          home:
+              languageProvider.isLanguageChosen
+                  ? const MyHomePage()
+                  : const LanguageSetupScreen(),
         );
       },
     );
@@ -110,6 +116,11 @@ class MyHomePage extends StatelessWidget {
                 'fr': '🇫🇷',
                 'hi': '🇮🇳',
                 'bn': '🇧🇩',
+                'es': '🇪🇸',
+                'de': '🇩🇪',
+                'tr': '🇹🇷',
+                'pt': '🇧🇷 ',
+                'id': '🇮🇩',
               };
 
               return PopupMenuButton<String>(
@@ -127,6 +138,11 @@ class MyHomePage extends StatelessWidget {
                     'fr': '🇫🇷 French',
                     'hi': '🇮🇳 Hindi',
                     'bn': '🇧🇩 Bangla',
+                    'es': '🇪🇸 Spanish',
+                    'de': '🇩🇪 German',
+                    'tr': '🇹🇷 Turkish',
+                    'pt': '🇧🇷 Portuguese (Brazil)',
+                    'id': '🇮🇩 Indonesian',
                   };
 
                   return languageOptions.entries.map((entry) {

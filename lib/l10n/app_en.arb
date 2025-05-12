@@ -21,5 +21,6 @@
   "pastePinterestUrl": "Paste Pinterest URL",
   "preview": "Preview",
   "adPlaceholder": "Ad Banner Placeholder",
-   "reset": "Reset"
+   "reset": "Reset",
+   "no_files_found":"No files found"
 }

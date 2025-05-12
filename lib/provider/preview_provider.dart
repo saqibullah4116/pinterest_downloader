@@ -45,10 +45,15 @@ class PreviewProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200 && response.data['status'] == 200) {
-        
         final data = response.data['data'];
-        _previewImageUrl = data['url'];
         _mediaType = data['type'];
+        debugPrint("********************************");
+        debugPrint("********************************");
+        debugPrint("********************************");
+        debugPrint(_mediaType);
+
+        _previewImageUrl =
+            _mediaType == "video" ? data['thumbnail'] : data['url'];
         _mediaSize = data['size'];
         _previewStatus = 'Preview fetched successfully!';
       } else {

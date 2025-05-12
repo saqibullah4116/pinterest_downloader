@@ -17,15 +17,26 @@ class LanguageSetupScreen extends StatelessWidget {
         barrierDismissible: false,
         builder: (context) => AlertDialog(
           title: const Text("Choose Language"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _langOption(context, '🇺🇸 English', 'en'),
-              _langOption(context, '🇵🇰 Urdu', 'ur'),
-              _langOption(context, '🇫🇷 French', 'fr'),
-              _langOption(context, '🇮🇳 Hindi', 'hi'),
-              _langOption(context, '🇧🇩 Bangla', 'bn'),
-            ],
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _langOption(context, '🇺🇸 English', 'en'),
+                  _langOption(context, '🇵🇰 Urdu', 'ur'),
+                  _langOption(context, '🇫🇷 French', 'fr'),
+                  _langOption(context, '🇮🇳 Hindi', 'hi'),
+                  _langOption(context, '🇧🇩 Bangla', 'bn'),
+                  _langOption(context, '🇮🇩 Indonesian', 'id'),
+                  _langOption(context, '🇧🇷 Portuguese (Brazil)', 'pt'),
+                  _langOption(context, '🇹🇷 Turkish', 'tr'),
+                  _langOption(context, '🇩🇪 German', 'de'),
+                  _langOption(context, '🇪🇸 Spanish', 'es'),
+                ],
+              ),
+            ),
           ),
         ),
       );
