@@ -68,9 +68,10 @@ class PreviewBottomSheet extends StatelessWidget {
           ),
           if (downloadStatus.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.only(top: 24),
               child: Text(
-                downloadStatus,
+                // downloadStatus,
+                "i am not empty",
                 style: const TextStyle(color: Colors.green),
               ),
             ),
@@ -83,7 +84,7 @@ class PreviewBottomSheet extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.refresh),
-              label: Text(AppLocalizations.of(context)!.reset),
+              label: Text(AppLocalizations.of(context).reset),
             ),
           ),
         ],

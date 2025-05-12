@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pinterest_downloader/components/VideoThumbnail.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 class MyFilesScreen extends StatefulWidget {
@@ -66,14 +67,14 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
           const SnackBar(content: Text("File deleted successfully!")),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("File not found!")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("File not found!")));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to delete file: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to delete file: $e")));
     }
   }
 
@@ -87,9 +88,9 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to share file: $e")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed to share file: $e")));
     }
   }
 
@@ -108,162 +109,179 @@ class _MyFilesScreenState extends State<MyFilesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
-      body: files.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.folder_open, size: 60, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  Text(
-                    "No files found",
-                    style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            )
-          : GridView.builder(
-              padding: const EdgeInsets.all(12),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: files.length,
-              itemBuilder: (context, index) {
-                final file = File(files[index].path);
-                final fileName = file.uri.pathSegments.last;
-                final fileExt = fileName.split('.').last.toLowerCase();
-
-                String fileDate = "Unknown date";
-                try {
-                  final lastModified = file.lastModifiedSync();
-                  fileDate = DateFormat('MMM dd • hh:mm a').format(lastModified);
-                } catch (e) {
-                  debugPrint("Error getting file date: $e");
-                }
-
-                return Card(
-                  elevation: 4,
-                  shadowColor: Colors.black26,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onTap: () {
-                      // Optional: preview or open file
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(16),
-                                ),
-                                child: _isVideoFile(file.path)
-                                    ? VideoThumbnail(file: file)
-                                    : Image.file(
-                                        file,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                            Container(
-                                              color: Colors.grey[200],
-                                              child: const Center(
-                                                child: Icon(
-                                                  Icons.image,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                      ),
-                              ),
-                              Positioned(
-                                top: 8,
-                                right: 8,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.4),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: PopupMenuButton<String>(
-                                    onSelected: (value) {
-                                      if (value == 'delete') {
-                                        _deleteFile(file);
-                                      } else if (value == 'share') {
-                                        _shareFile(file);
-                                      }
-                                    },
-                                    itemBuilder: (context) => [
-                                      const PopupMenuItem(
-                                        value: 'share',
-                                        child: Text('Share'),
-                                      ),
-                                      const PopupMenuItem(
-                                        value: 'delete',
-                                        child: Text('Delete'),
-                                      ),
-                                    ],
-                                    icon: const Icon(Icons.more_vert,
-                                        color: Colors.white, size: 25),
-                                    color: Colors.white,
-                                    elevation: 4,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                fileName.length > 20
-                                    ? '${fileName.substring(0, 15)}...$fileExt'
-                                    : fileName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                maxLines: 1,
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    _formatFileSize(file.lengthSync()),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  Text(
-                                    fileDate,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+      body:
+          files.isEmpty
+              ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.folder_open, size: 60, color: Colors.grey[400]),
+                    SizedBox(height: 16),
+                    Text(
+                     AppLocalizations.of(context).no_files_found,
+                      style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                     ),
-                  ),
-                );
-              },
-            ),
+                  ],
+                ),
+              )
+              : GridView.builder(
+                padding: const EdgeInsets.all(12),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: files.length,
+                itemBuilder: (context, index) {
+                  final file = File(files[index].path);
+                  final fileName = file.uri.pathSegments.last;
+                  final fileExt = fileName.split('.').last.toLowerCase();
+
+                  String fileDate = "Unknown date";
+                  try {
+                    final lastModified = file.lastModifiedSync();
+                    fileDate = DateFormat(
+                      'MMM dd • hh:mm a',
+                    ).format(lastModified);
+                  } catch (e) {
+                    debugPrint("Error getting file date: $e");
+                  }
+
+                  return Card(
+                    elevation: 4,
+                    shadowColor: Colors.black26,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: () {
+                        // Optional: preview or open file
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                  child:
+                                      _isVideoFile(file.path)
+                                          ? VideoThumbnail(file: file)
+                                          : SizedBox.expand(
+                                            child: Image.file(
+                                              file,
+                                              fit: BoxFit.cover,
+                                              alignment: Alignment.center,
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => Container(
+                                                    color: Colors.grey[200],
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.image,
+                                                        size: 40,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                                  ),
+                                            ),
+                                          ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.surface.withOpacity(0.8),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: PopupMenuButton<String>(
+                                      onSelected: (value) {
+                                        if (value == 'delete') {
+                                          _deleteFile(file);
+                                        } else if (value == 'share') {
+                                          _shareFile(file);
+                                        }
+                                      },
+                                      itemBuilder:
+                                          (context) => [
+                                            const PopupMenuItem(
+                                              value: 'share',
+                                              child: Text('Share'),
+                                            ),
+                                            const PopupMenuItem(
+                                              value: 'delete',
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                      icon: Icon(
+                                        Icons.more_vert,
+                                        size: 25,
+                                        color:
+                                            Theme.of(context).iconTheme.color,
+                                      ),
+                                      elevation: 4,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fileName.length > 20
+                                      ? '${fileName.substring(0, 15)}...$fileExt'
+                                      : fileName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  maxLines: 1,
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _formatFileSize(file.lengthSync()),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    Text(
+                                      fileDate,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
     );
   }
 }

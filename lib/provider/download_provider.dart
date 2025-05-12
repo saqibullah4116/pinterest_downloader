@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -116,85 +117,70 @@ class DownloadProvider with ChangeNotifier {
     }
   }
 
-  Future<void> _requestAndSaveVideo(String url) async {
-    try {
-      print("🔄 Starting download of video from: $url");
+ Future<void> _requestAndSaveVideo(String url) async {
+  try {
+    debugPrint("🔄 Starting download of video from: $url");
 
-      bool permissionGranted = await _requestPermission();
-      print("📛 Permission granted: $permissionGranted");
+    bool permissionGranted = await _requestPermission();
+    debugPrint("📛 Permission granted: $permissionGranted");
 
-      if (!permissionGranted) {
-        _downloadStatus = 'Permission Denied!';
-        print("❌ Permission denied.");
-        return;
-      }
-
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
-      if (token == null) {
-        _downloadStatus = 'No token found!';
-        print("❌ Missing token.");
-        return;
-      }
-
-      final tempDir = await getTemporaryDirectory();
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final tempPath = '${tempDir.path}/video_$timestamp.mp4';
-      print("📁 Temp path: $tempPath");
-
-      final formData = FormData.fromMap({'url': url});
-      late Response<ResponseBody> response;
-
-      try {
-        response = await _dio.post<ResponseBody>(
-          'https://pin.canvaapk.com/api/pin-download',
-          data: formData,
-          options: Options(
-            headers: {'Authorization': 'Bearer $token'},
-            responseType: ResponseType.stream,
-          ),
-        );
-      } catch (e) {
-        print("❌ Dio video request failed: $e");
-        _downloadStatus = "Download failed: $e";
-        return;
-      }
-
-      if (response.statusCode == 200) {
-        File file = File(tempPath);
-        IOSink sink = file.openWrite();
-        await response.data!.stream.forEach((chunk) => sink.add(chunk));
-        await sink.flush();
-        await sink.close();
-        print("✅ Video file written.");
-
-        final targetDir = Directory('/storage/emulated/0/Download/MyAppVideos');
-        if (!targetDir.existsSync()) {
-          targetDir.createSync(recursive: true);
-          print("📂 Created target video dir: ${targetDir.path}");
-        }
-
-        final savedFile = await file.copy(
-          '${targetDir.path}/video_$timestamp.mp4',
-        );
-        print("✅ Video copied to: ${savedFile.path}");
-
-        await _notifyMediaScanner(savedFile.path);
-        print("📸 Media scanner notified for video.");
-
-        _downloadStatus =
-            savedFile.existsSync()
-                ? 'Video saved to gallery!'
-                : 'Failed to save video!';
-      } else {
-        _downloadStatus = 'Download failed. Status: ${response.statusCode}';
-        print("❌ Server returned error: ${response.statusCode}");
-      }
-    } catch (e) {
-      _downloadStatus = 'Error saving video: $e';
-      print("❌ Exception during video saving: $e");
+    if (!permissionGranted) {
+      _downloadStatus = 'Permission Denied!';
+      debugPrint("❌ Permission denied.");
+      return;
     }
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    if (token == null) {
+      _downloadStatus = 'No token found!';
+      debugPrint("❌ Missing token.");
+      return;
+    }
+
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final targetDir = Directory('/storage/emulated/0/Download/MyAppVideos');
+    if (!targetDir.existsSync()) {
+      targetDir.createSync(recursive: true);
+    }
+    final savePath = '${targetDir.path}/video_$timestamp.mp4';
+
+    // We create a temp file so that even partial downloads don't pollute the final folder
+    final tempDir = await getTemporaryDirectory();
+    final tempPath = '${tempDir.path}/video_$timestamp.tmp.mp4';
+
+    FormData formData = FormData.fromMap({'url': url});
+
+    debugPrint("⬇ Downloading to temp: $tempPath");
+
+    try {
+      Response response = await _dio.post(
+        'https://pin.canvaapk.com/api/pin-download',
+        data: formData,
+        options: Options(
+          headers: {'Authorization': 'Bearer $token'},
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      final file = File(tempPath);
+      await file.writeAsBytes(response.data);
+
+      final savedFile = await file.copy(savePath);
+      await _notifyMediaScanner(savedFile.path);
+      debugPrint("✅ Video saved to: ${savedFile.path}");
+
+      _downloadStatus = 'Video downloaded!';
+    } catch (e) {
+      debugPrint("❌ Failed to download video: $e");
+      _downloadStatus = "Download failed: $e";
+    }
+  } catch (e) {
+    _downloadStatus = 'Error saving video: $e';
+    debugPrint("❌ Exception during video saving: $e");
   }
+}
+
 
   Future<bool> _requestPermission() async {
     if (!Platform.isAndroid) return true;

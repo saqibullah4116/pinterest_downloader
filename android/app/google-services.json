@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173895274284",
+    "project_id": "pinterest-a6181",
+    "storage_bucket": "pinterest-a6181.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173895274284:android:08b86fcf267b8c6aae6689",
+        "android_client_info": {
+          "package_name": "com.example.pinterest_downloader"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC30Mw7JveSheWs0UaZb_3o9Ez_rieHuX4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
