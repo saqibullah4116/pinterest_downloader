@@ -12,36 +12,6 @@ class AppTheme {
 
 // Class to define all our themes
 class AppThemes {
-  static final pinterest = AppTheme(
-    name: 'Pinterest',
-    themeData: ThemeData(
-      brightness: Brightness.light,
-      primaryColor: const Color(0xFFE60023),
-      colorScheme: const ColorScheme.light(
-        primary: Color(0xFFE60023),
-        secondary: Color(0xFFBD081C),
-        surface: Colors.white,
-        background: Color(0xFFF8F8F8),
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onSurface: Colors.black87,
-        onBackground: Colors.black87,
-      ),
-      scaffoldBackgroundColor: const Color(0xFFF8F8F8),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFFE60023),
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      cardTheme: CardTheme(
-        color: Colors.white,
-        elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      iconTheme: const IconThemeData(color: Color(0xFFE60023)),
-    ),
-  );
-
   static final light = AppTheme(
     name: 'Light',
     themeData: ThemeData(
@@ -223,7 +193,6 @@ class AppThemes {
   );
 
   static final List<AppTheme> all = [
-    pinterest,
     light,
     dark,
     midnight,

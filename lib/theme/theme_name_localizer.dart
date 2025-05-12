@@ -5,8 +5,6 @@ String getLocalizedThemeName(BuildContext context, String themeName) {
   final loc = AppLocalizations.of(context)!;
 
   switch (themeName) {
-    case 'Pinterest':
-      return loc.pinterest;
     case 'Light':
       return loc.light;
     case 'Dark':

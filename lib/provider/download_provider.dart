@@ -24,6 +24,7 @@ class DownloadProvider with ChangeNotifier {
     String url,
     String mediaType,
     String previewUrl,
+    String videoDownloadURL
   ) async {
     _isDownloading = true;
     _downloadStatus = 'Downloading...';
@@ -33,7 +34,7 @@ class DownloadProvider with ChangeNotifier {
       if (mediaType == 'image') {
         await _downloadAndSaveImage(previewUrl);
       } else if (mediaType == 'video') {
-        await _requestAndSaveVideo(url);
+        await _requestAndSaveVideo(videoDownloadURL);
       } else {
         _downloadStatus = 'Unsupported media type!';
       }

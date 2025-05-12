@@ -62,6 +62,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
       _urlController.text.trim(),
       previewProvider.mediaType ?? '',
       previewProvider.previewImageUrl ?? '',
+      previewProvider.videoDownloadURL ?? '',
     );
 
     final message = downloadProvider.downloadStatus;
