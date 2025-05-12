@@ -8,12 +8,14 @@ class PreviewProvider with ChangeNotifier {
   String? _previewImageUrl;
   String? _mediaType;
   String? _mediaSize;
+  String? _videoDownloadURL;
 
   bool get isFetchingPreview => _isFetchingPreview;
   String get previewStatus => _previewStatus;
   String? get previewImageUrl => _previewImageUrl;
   String? get mediaType => _mediaType;
   String? get mediaSize => _mediaSize;
+  String? get videoDownloadURL => _videoDownloadURL;
 
   final Dio _dio = Dio();
 
@@ -23,6 +25,7 @@ class PreviewProvider with ChangeNotifier {
     _previewImageUrl = null;
     _mediaType = null;
     _mediaSize = null;
+    _videoDownloadURL = null;
     notifyListeners();
 
     try {
@@ -54,6 +57,9 @@ class PreviewProvider with ChangeNotifier {
 
         _previewImageUrl =
             _mediaType == "video" ? data['thumbnail'] : data['url'];
+        if (_mediaType == "video") {
+          _videoDownloadURL = data['url'];
+        }
         _mediaSize = data['size'];
         _previewStatus = 'Preview fetched successfully!';
       } else {

@@ -18,7 +18,6 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
   @override
   void initState() {
     super.initState();
-    print("********** Video Thumbnail Init **********");
     requestStoragePermission().then((_) {
       initializeVideo();
     });
@@ -26,62 +25,91 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
 
   /// Request Storage Permission
   Future<void> requestStoragePermission() async {
-    print("Requesting storage permission...");
     var status = await Permission.storage.request();
-    if (status.isGranted) {
-      print("✅ Storage permission granted.");
-    } else {
-      print("❌ Storage permission denied.");
+    if (!status.isGranted && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("❌ Storage permission denied.")),
+      );
     }
   }
 
   /// Initialize Video Player
   void initializeVideo() {
-    print("Video File Path: ${widget.file.path}");
-
     if (!widget.file.existsSync()) {
-      print("❌ ERROR: File does not exist!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("❌ ERROR: File does not exist!")),
+      );
       return;
     }
 
     try {
       _controller = VideoPlayerController.file(widget.file)
-        ..initialize().then((_) {
-          setState(() {
-            _isInitialized = true;
-            _controller.setLooping(true);
-            _controller.setVolume(0);
-            _controller.play();
-          });
-          print("✅ Video initialized successfully.");
-        }).catchError((error) {
-          print("❌ ERROR initializing video: $error");
-        });
+        ..initialize()
+            .then((_) {
+              if (!mounted) return;
+              setState(() {
+                _isInitialized = true;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("✅ Video initialized successfully."),
+                ),
+              );
+            })
+            .catchError((error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("❌ ERROR initializing video: $error")),
+              );
+            });
     } catch (e) {
-      print("❌ Exception during initialization: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("❌ Exception during initialization: $e")),
+      );
     }
   }
 
   @override
   void dispose() {
-    print("Disposing video player...");
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Toggle Play/Pause
+  void _togglePlayPause() {
+    setState(() {
+      _controller.value.isPlaying ? _controller.pause() : _controller.play();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
-      height: 100,
-      child: _isInitialized
-          ? AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              child: VideoPlayer(_controller),
-            )
-          : const Center(
-              child: Icon(Icons.video_library, size: 50, color: Colors.red),
-            ),
+      child:
+          _isInitialized
+              ? GestureDetector(
+                onTap: _togglePlayPause,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox.expand(
+                      child: AspectRatio(
+                        aspectRatio: _controller.value.aspectRatio,
+                        child: VideoPlayer(_controller),
+                      ),
+                    ),
+                    Icon(
+                      _controller.value.isPlaying
+                          ? Icons.pause_circle_filled
+                          : Icons.play_circle_fill,
+                      size: 40,
+                      color: Colors.white70,
+                    ),
+                  ],
+                ),
+              )
+              : const Center(
+                child: Icon(Icons.video_library, size: 50, color: Colors.red),
+              ),
     );
   }
 }
