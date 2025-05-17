@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pinterest_downloader/screens/privacy_policy_screen.dart';
 import 'package:pinterest_downloader/theme/theme_name_localizer.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -115,16 +116,22 @@ class _ThemeDrawerState extends State<ThemeDrawer> {
             leading: const Icon(Icons.article),
             title: Text(AppLocalizations.of(context).privacyPolicy),
             onTap: () {
-              // Navigate to Privacy Policy
+              Navigator.pop(context); // Close the drawer
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PrivacyPolicyPage(),
+                ),
+              );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.info),
-            title: Text(AppLocalizations.of(context).aboutUs),
-            onTap: () {
-              // Navigate to About Us
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.info),
+          //   title: Text(AppLocalizations.of(context).aboutUs),
+          //   onTap: () {
+          //     // Navigate to About Us
+          //   },
+          // ),
 
           Padding(
             padding: EdgeInsets.all(16.0),
