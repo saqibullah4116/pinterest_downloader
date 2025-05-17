@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class VideoThumbnail extends StatefulWidget {
   final File file;
@@ -18,19 +17,7 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
   @override
   void initState() {
     super.initState();
-    requestStoragePermission().then((_) {
-      initializeVideo();
-    });
-  }
-
-  /// Request Storage Permission
-  Future<void> requestStoragePermission() async {
-    var status = await Permission.storage.request();
-    if (!status.isGranted && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Storage permission denied.")),
-      );
-    }
+    initializeVideo();
   }
 
   /// Initialize Video Player
@@ -50,11 +37,6 @@ class _VideoThumbnailState extends State<VideoThumbnail> {
               setState(() {
                 _isInitialized = true;
               });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("✅ Video initialized successfully."),
-                ),
-              );
             })
             .catchError((error) {
               ScaffoldMessenger.of(context).showSnackBar(
