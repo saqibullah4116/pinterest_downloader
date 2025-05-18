@@ -24,9 +24,10 @@ class DownloadProvider with ChangeNotifier {
     String url,
     String mediaType,
     String previewUrl,
-    String videoDownloadURL
+    String videoDownloadURL,
   ) async {
     _isDownloading = true;
+    _progress = 0;
     _downloadStatus = 'Downloading...';
     notifyListeners();
 
@@ -40,30 +41,24 @@ class DownloadProvider with ChangeNotifier {
       }
     } catch (e) {
       _downloadStatus = 'Error: $e';
-      print("❌ Global exception: $e");
     } finally {
       _isDownloading = false;
+      _progress = 0;
       notifyListeners();
     }
   }
 
   Future<void> _downloadAndSaveImage(String imageUrl) async {
     try {
-      print("🔄 Starting download of image from: $imageUrl");
-
       bool permissionGranted = await _requestPermission();
-      print("📛 Permission granted: $permissionGranted");
-
       if (!permissionGranted) {
         _downloadStatus = 'Permission Denied!';
-        print("❌ Permission denied.");
         return;
       }
 
       final tempDir = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final tempPath = '${tempDir.path}/image_$timestamp.jpg';
-      print("📁 Temp path: $tempPath");
 
       try {
         await _dio.download(
@@ -76,9 +71,8 @@ class DownloadProvider with ChangeNotifier {
           ),
           onReceiveProgress: (received, total) {
             if (total != -1) {
-              print(
-                "⬇️ Download progress: ${(received / total * 100).toStringAsFixed(0)}%",
-              );
+              _progress = received / total;
+              notifyListeners();
             }
           },
         );
@@ -88,100 +82,77 @@ class DownloadProvider with ChangeNotifier {
         return;
       }
 
-      print("✅ Download completed!");
-
       final tempFile = File(tempPath);
       if (!tempFile.existsSync()) {
         _downloadStatus = "Downloaded file missing!";
-        print("❌ Downloaded temp file missing!");
         return;
       }
 
       final targetDir = Directory('/storage/emulated/0/Download/MyAppImages');
       if (!targetDir.existsSync()) {
-        print("📂 Creating target directory: ${targetDir.path}");
         targetDir.createSync(recursive: true);
       }
 
       final savedPath = '${targetDir.path}/image_$timestamp.jpg';
       final savedFile = await tempFile.copy(savedPath);
-      print("✅ Image copied to: $savedPath");
-
       await _notifyMediaScanner(savedPath);
-      print("📸 Media scanner notified.");
 
       _downloadStatus =
           savedFile.existsSync() ? 'Image saved!' : 'Failed to save image!';
     } catch (e) {
       _downloadStatus = 'Error saving image: $e';
-      print("❌ Exception during image saving: $e");
     }
   }
 
- Future<void> _requestAndSaveVideo(String url) async {
-  try {
-    debugPrint("🔄 Starting download of video from: $url");
-
-    bool permissionGranted = await _requestPermission();
-    debugPrint("📛 Permission granted: $permissionGranted");
-
-    if (!permissionGranted) {
-      _downloadStatus = 'Permission Denied!';
-      debugPrint("❌ Permission denied.");
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('auth_token');
-    if (token == null) {
-      _downloadStatus = 'No token found!';
-      debugPrint("❌ Missing token.");
-      return;
-    }
-
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final targetDir = Directory('/storage/emulated/0/Download/MyAppVideos');
-    if (!targetDir.existsSync()) {
-      targetDir.createSync(recursive: true);
-    }
-    final savePath = '${targetDir.path}/video_$timestamp.mp4';
-
-    // We create a temp file so that even partial downloads don't pollute the final folder
-    final tempDir = await getTemporaryDirectory();
-    final tempPath = '${tempDir.path}/video_$timestamp.tmp.mp4';
-
-    FormData formData = FormData.fromMap({'url': url});
-
-    debugPrint("⬇ Downloading to temp: $tempPath");
-
+  Future<void> _requestAndSaveVideo(String url) async {
     try {
-      Response response = await _dio.post(
-        'https://pin.canvaapk.com/api/pin-download',
-        data: formData,
+      bool permissionGranted = await _requestPermission();
+      if (!permissionGranted) {
+        _downloadStatus = 'Permission Denied!';
+        notifyListeners();
+        return;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      if (token == null) {
+        _downloadStatus = 'No token found!';
+        notifyListeners();
+        return;
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final targetDir = Directory('/storage/emulated/0/Download/MyAppVideos');
+      if (!targetDir.existsSync()) {
+        targetDir.createSync(recursive: true);
+      }
+      final savePath = '${targetDir.path}/video_$timestamp.mp4';
+
+      // Here, we use dio.download with headers and progress callback
+      await _dio.download(
+        url,
+        savePath,
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
-          responseType: ResponseType.bytes,
+          responseType: ResponseType.bytes, // or ResponseType.stream works too
         ),
+        onReceiveProgress: (received, total) {
+          if (total != -1) {
+            _progress = received / total;
+            notifyListeners();
+          }
+        },
       );
 
-      final file = File(tempPath);
-      await file.writeAsBytes(response.data);
-
-      final savedFile = await file.copy(savePath);
-      await _notifyMediaScanner(savedFile.path);
-      debugPrint("✅ Video saved to: ${savedFile.path}");
+      await _notifyMediaScanner(savePath);
 
       _downloadStatus = 'Video downloaded!';
+      notifyListeners();
     } catch (e) {
-      debugPrint("❌ Failed to download video: $e");
-      _downloadStatus = "Download failed: $e";
+      _downloadStatus = 'Download failed: $e';
+      notifyListeners();
     }
-  } catch (e) {
-    _downloadStatus = 'Error saving video: $e';
-    debugPrint("❌ Exception during video saving: $e");
   }
-}
-
 
   Future<bool> _requestPermission() async {
     if (!Platform.isAndroid) return true;
@@ -189,8 +160,6 @@ class DownloadProvider with ChangeNotifier {
     final deviceInfo = DeviceInfoPlugin();
     final androidInfo = await deviceInfo.androidInfo;
     final sdkInt = androidInfo.version.sdkInt;
-
-    print("🔧 Android SDK version: $sdkInt");
 
     if (sdkInt >= 33) {
       final photos = await Permission.photos.request();

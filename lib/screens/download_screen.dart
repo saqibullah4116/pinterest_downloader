@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../components/preview_bottom_sheet.dart';
 import '../provider/preview_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../provider/download_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DownloadScreen extends StatefulWidget {
   const DownloadScreen({super.key});
@@ -37,7 +37,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
     final url = _urlController.text.trim();
     if (url.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text( AppLocalizations.of(context).pastePinterestUrl)),
+        SnackBar(content: Text(AppLocalizations.of(context).pastePinterestUrl)),
       );
       return;
     }
@@ -48,9 +48,9 @@ class _DownloadScreenState extends State<DownloadScreen> {
     if (previewProvider.previewImageUrl != null && mounted) {
       _showPreviewBottomSheet();
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(previewProvider.previewStatus)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(previewProvider.previewStatus)),
+      );
     }
   }
 
@@ -68,10 +68,8 @@ class _DownloadScreenState extends State<DownloadScreen> {
     final message = downloadProvider.downloadStatus;
 
     if (mounted) {
-      Navigator.of(bottomSheetContext).pop(); // Close bottom sheet
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      Navigator.of(bottomSheetContext).pop();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     }
     _handleReset();
   }
@@ -84,7 +82,6 @@ class _DownloadScreenState extends State<DownloadScreen> {
 
   void _showPreviewBottomSheet() {
     final previewProvider = context.read<PreviewProvider>();
-    final downloadProvider = context.read<DownloadProvider>();
 
     showModalBottomSheet(
       context: context,
@@ -93,14 +90,23 @@ class _DownloadScreenState extends State<DownloadScreen> {
       ),
       isScrollControlled: false,
       builder: (bottomSheetContext) {
-        return PreviewBottomSheet(
-          imageUrl: previewProvider.previewImageUrl ?? '',
-          mediaSize: previewProvider.mediaSize ?? 'Unknown Size',
-          mediaType: previewProvider.mediaType ?? 'Unknown Type',
-          isDownloading: downloadProvider.isDownloading,
-          onDownload: () => _handleDownload(bottomSheetContext),
-          onReset: _handleReset,
-          downloadStatus: downloadProvider.downloadStatus,
+        return Consumer<DownloadProvider>(
+          builder: (context, downloadProvider, _) {
+            print("isDownloading: ${downloadProvider.isDownloading}");
+            print("progress: ${downloadProvider.progress}");
+            print("downloadStatus: ${downloadProvider.downloadStatus}");
+
+            return PreviewBottomSheet(
+              imageUrl: previewProvider.previewImageUrl ?? '',
+              mediaSize: previewProvider.mediaSize ?? 'Unknown Size',
+              mediaType: previewProvider.mediaType ?? 'Unknown Type',
+              isDownloading: downloadProvider.isDownloading,
+              onDownload: () => _handleDownload(bottomSheetContext),
+              onReset: _handleReset,
+              downloadStatus: downloadProvider.downloadStatus,
+              progress: downloadProvider.progress,
+            );
+          },
         );
       },
     );
@@ -121,9 +127,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context).pastePinterestUrl,
                 hintText: 'https://www.pinterest.com/pin/...',
-                labelStyle: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -131,9 +135,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -143,10 +145,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                     width: 2,
                   ),
                 ),
-                prefixIcon: Icon(
-                  Icons.link,
-                  color: Theme.of(context).iconTheme.color,
-                ),
+                prefixIcon: Icon(Icons.link, color: Theme.of(context).iconTheme.color),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.paste),
                   tooltip: 'Paste from clipboard',
@@ -159,9 +158,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
                   },
                 ),
                 filled: true,
-                fillColor: Theme.of(
-                  context,
-                ).colorScheme.surface.withOpacity(0.05),
+                fillColor: Theme.of(context).colorScheme.surface.withOpacity(0.05),
               ),
               keyboardType: TextInputType.url,
               textInputAction: TextInputAction.done,
@@ -184,6 +181,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
               const Center(child: CircularProgressIndicator()),
 
             const SizedBox(height: 30),
+
             Container(
               height: 100,
               width: double.infinity,
@@ -194,7 +192,7 @@ class _DownloadScreenState extends State<DownloadScreen> {
               alignment: Alignment.center,
               child: Text(
                 AppLocalizations.of(context).adPlaceholder,
-                style: TextStyle(color: Colors.black54),
+                style: const TextStyle(color: Colors.black54),
               ),
             ),
           ],
