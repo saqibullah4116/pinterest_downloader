@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:pinterest_downloader/components/language_selector_menu.dart';
 import 'package:pinterest_downloader/provider/auth_provider.dart';
 import 'package:pinterest_downloader/provider/language_provider.dart';
 import 'package:pinterest_downloader/provider/theme_provider.dart';
+import 'package:pinterest_downloader/screens/on_boarding_screen.dart';
 import 'package:pinterest_downloader/theme/theme_drawer.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/constants.dart';
 import 'screens/home_screen.dart';
-import 'screens/language_setup_screen.dart';
 import 'provider/preview_provider.dart';
 import 'provider/download_provider.dart';
 
@@ -22,19 +24,42 @@ void main() {
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isOnboardingComplete = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkOnboardingStatus();
+  }
+
+  Future<void> _checkOnboardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final completed = prefs.getBool('onboarding_complete') ?? false;
+    setState(() {
+      _isOnboardingComplete = completed;
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
-    if (!themeProvider.isLoaded) {
+    if (!themeProvider.isLoaded || _isLoading) {
       return MaterialApp(
         home: Scaffold(
           body: Center(child: CircularProgressIndicator(color: Colors.red)),
@@ -45,6 +70,7 @@ class MyApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, _) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: AppStrings.appName,
           theme: themeProvider.themeData,
           locale: languageProvider.locale,
@@ -67,9 +93,9 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           home:
-              languageProvider.isLanguageChosen
+              _isOnboardingComplete
                   ? const MyHomePage()
-                  : const LanguageSetupScreen(),
+                  : const OnboardingScreen(),
         );
       },
     );
@@ -105,57 +131,7 @@ class MyHomePage extends StatelessWidget {
             );
           },
         ),
-        actions: [
-          Consumer<LanguageProvider>(
-            builder: (context, languageProvider, _) {
-              final langCode = languageProvider.locale.languageCode;
-
-              final flagMap = {
-                'en': '🇺🇸',
-                'ur': '🇵🇰',
-                'fr': '🇫🇷',
-                'hi': '🇮🇳',
-                'bn': '🇧🇩',
-                'es': '🇪🇸',
-                'de': '🇩🇪',
-                'tr': '🇹🇷',
-                'pt': '🇧🇷 ',
-                'id': '🇮🇩',
-              };
-
-              return PopupMenuButton<String>(
-                icon: Text(
-                  flagMap[langCode] ?? '🌐',
-                  style: const TextStyle(fontSize: 24),
-                ),
-                onSelected: (String code) {
-                  languageProvider.setLocale(Locale(code));
-                },
-                itemBuilder: (BuildContext context) {
-                  final languageOptions = {
-                    'en': '🇺🇸 English',
-                    'ur': '🇵🇰 Urdu',
-                    'fr': '🇫🇷 French',
-                    'hi': '🇮🇳 Hindi',
-                    'bn': '🇧🇩 Bangla',
-                    'es': '🇪🇸 Spanish',
-                    'de': '🇩🇪 German',
-                    'tr': '🇹🇷 Turkish',
-                    'pt': '🇧🇷 Portuguese (Brazil)',
-                    'id': '🇮🇩 Indonesian',
-                  };
-
-                  return languageOptions.entries.map((entry) {
-                    return PopupMenuItem<String>(
-                      value: entry.key,
-                      child: Text(entry.value),
-                    );
-                  }).toList();
-                },
-              );
-            },
-          ),
-        ],
+        actions: [LanguageSelector()],
       ),
       drawer: ThemeDrawer(),
       body: const HomeScreen(),
