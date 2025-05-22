@@ -132,7 +132,7 @@ class PrivacyPolicyPage extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.download_for_offline),
               title: const Text(
-                'Go to Pinterest Video Downloader Tool',
+                'Go to Our Website',
                 style: TextStyle(
                   decoration: TextDecoration.underline,
                   fontWeight: FontWeight.bold,
