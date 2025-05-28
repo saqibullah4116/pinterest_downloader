@@ -42,7 +42,7 @@ class PreviewProvider with ChangeNotifier {
       final formData = FormData.fromMap({'url': url});
 
       final response = await _dio.post(
-        'https://pin.canvaapk.com/api/pin-search',
+        'https://pinterestvideodownloader.pro/api/pin-search',
         data: formData,
         options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
@@ -50,10 +50,6 @@ class PreviewProvider with ChangeNotifier {
       if (response.statusCode == 200 && response.data['status'] == 200) {
         final data = response.data['data'];
         _mediaType = data['type'];
-        debugPrint("********************************");
-        debugPrint("********************************");
-        debugPrint("********************************");
-        debugPrint(_mediaType);
 
         _previewImageUrl =
             _mediaType == "video" ? data['thumbnail'] : data['url'];

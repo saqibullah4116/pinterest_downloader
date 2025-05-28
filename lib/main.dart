@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pinterest_downloader/components/language_selector_menu.dart';
+import 'package:pinterest_downloader/l10n/app_localizations.dart';
 import 'package:pinterest_downloader/provider/auth_provider.dart';
 import 'package:pinterest_downloader/provider/language_provider.dart';
 import 'package:pinterest_downloader/provider/theme_provider.dart';
 import 'package:pinterest_downloader/screens/on_boarding_screen.dart';
 import 'package:pinterest_downloader/theme/theme_drawer.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'utils/constants.dart';
@@ -14,7 +14,7 @@ import 'screens/home_screen.dart';
 import 'provider/preview_provider.dart';
 import 'provider/download_provider.dart';
 
-void main() {
+Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [

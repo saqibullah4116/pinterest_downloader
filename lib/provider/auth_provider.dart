@@ -14,7 +14,7 @@ class AuthProvider with ChangeNotifier {
 
     // if (_token == null) {
       final response = await http.post(
-        Uri.parse('https://pin.canvaapk.com/api/auth/token'),
+        Uri.parse('https://pinterestvideodownloader.pro/api/auth/token'),
         headers: {'x-api-key': 'JJHKHKHIUIJKNKNKNKNKNUIU4343453453'},
       );
       if (response.statusCode == 200) {

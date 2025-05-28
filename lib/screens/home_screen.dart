@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pinterest_downloader/l10n/app_localizations.dart';
 import 'package:pinterest_downloader/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../utils/constants.dart';
 import 'download_screen.dart';
 import 'my_files_screen.dart';
 import '../provider/auth_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
