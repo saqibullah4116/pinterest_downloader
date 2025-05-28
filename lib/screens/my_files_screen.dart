@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pinterest_downloader/components/VideoThumbnail.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
+import 'package:pinterest_downloader/l10n/app_localizations.dart';
+
 
 class MyFilesScreen extends StatefulWidget {
   const MyFilesScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinterest_downloader/screens/privacy_policy_screen.dart';
 import 'package:pinterest_downloader/theme/theme_name_localizer.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pinterest_downloader/l10n/app_localizations.dart';
 
 import 'package:provider/provider.dart';
 import '../provider/theme_provider.dart';
