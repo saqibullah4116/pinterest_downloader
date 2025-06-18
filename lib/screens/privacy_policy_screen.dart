@@ -4,11 +4,10 @@ import 'package:url_launcher/url_launcher.dart';
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
 
-  // Function to launch URL externally
   void _launchUrl(String url) async {
     final uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw 'Could not launch $url';
+      throw 'Could not launch \$url';
     }
   }
 
@@ -20,128 +19,142 @@ class PrivacyPolicyPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '1. Information We Collect',
+          children: const [
+            Text(
+              'Privacy Policy for Pinterest Video Downloader App',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text('Effective Date: June 18, 2025'),
+            SizedBox(height: 8),
+            Text(
+              'Thank you for using the Pinterest Video Downloader App. This Privacy Policy explains how we handle your information when you use our App. We are committed to protecting your privacy and ensuring transparency about our practices.',
+            ),
+            SizedBox(height: 16),
+            Text(
+              '1. No Collection of Personal Data',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'We do not collect any personally identifiable information (PII) such as your name, email address, or account credentials when you use our tool. Our site is designed to function without requiring user registration or personal input.\n\n'
-              'We may collect limited non-personal data automatically, such as:\n\n'
-              '- IP address (anonymized for analytics)\n'
-              '- Browser type and version\n'
-              '- Operating system\n'
-              '- Referring URLs\n'
-              '- Time and date of access\n\n'
-              'This information is used solely for statistical analysis, site performance improvements, and troubleshooting.',
+            SizedBox(height: 8),
+            Text(
+              'We do not collect, store, or process any personal data from users of the App. This includes, but is not limited to, your name, email address, phone number, location, or any other personally identifiable information. The App operates without requiring user accounts, logins, or any form of personal data submission.',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '2. Cookies',
+            SizedBox(height: 16),
+            Text(
+              '2. User-Provided URLs',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'PinterestVideoDownloader.pro uses cookies and similar technologies to enhance user experience and analyze site traffic. You can choose to disable cookies through your browser settings, but this may affect certain functionalities of the website.',
+            SizedBox(height: 8),
+            Text(
+              'The App allows you to download videos, images, or GIFs from Pinterest by manually entering a URL (web address) of the content you wish to download. These URLs are processed solely within the App to facilitate the download and are not stored, shared, or transmitted to any servers or third parties. We do not track or retain any information related to the URLs you provide.',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '3. Third-Party Services',
+            SizedBox(height: 16),
+            Text(
+              '3. User Responsibility',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'We may use trusted third-party analytics tools (e.g., Google Analytics) to gather anonymous usage data. These services may use cookies or similar tracking technologies, but we do not share any personally identifiable information with them.\n\n'
-              'We are not responsible for the privacy practices of Pinterest or any other third-party websites linked or mentioned on our site.',
+            SizedBox(height: 8),
+            Text(
+              "You are solely responsible for the URLs you input into the App and for ensuring that your use of the App complies with Pinterest's Terms of Service and applicable laws. We do not have any affiliation with Pinterest, nor do we monitor, control, or assume responsibility for the content you choose to download. The App acts as a tool to assist you in downloading publicly available content, and you are responsible for obtaining any necessary permissions or rights to download and use such content.",
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '4. Use of Download Tool',
+            SizedBox(height: 16),
+            Text(
+              '4. No Third-Party Data Sharing',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'All downloads initiated through PinterestVideoDownloader.pro are processed in real-time and not stored on our servers. The responsibility for any content downloaded lies solely with the user. Ensure that your use complies with Pinterest’s Terms of Service and copyright laws.',
+            SizedBox(height: 8),
+            Text(
+              'Since we do not collect any data from you, there is no data to share with third parties. The App does not integrate with third-party services for analytics, advertising, or any other purpose that would involve data sharing.',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '5. Children’s Privacy',
+            SizedBox(height: 16),
+            Text(
+              '5. No Tracking or Analytics',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'This site is not intended for use by individuals under the age of 13. We do not knowingly collect data from children.',
+            SizedBox(height: 8),
+            Text(
+              'The App does not use cookies, trackers, or analytics tools to monitor your activity. Your interactions with the App remain private.',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '6. Data Security',
+            SizedBox(height: 16),
+            Text(
+              '6. Security',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'While no website is 100% secure, we implement reasonable technical and organizational safeguards to protect the data we collect from misuse, unauthorized access, or disclosure.',
+            SizedBox(height: 8),
+            Text(
+              'We take reasonable measures to ensure the App is secure and free from vulnerabilities. However, as no system is entirely immune to risks, you use the App at your own discretion. Since no personal data is collected, there is no risk of personal data exposure.',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '7. Changes to This Policy',
+            SizedBox(height: 16),
+            Text(
+              '7. Children\'s Privacy',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'We reserve the right to modify this Privacy Policy at any time. Updates will be posted on this page with a revised effective date.',
+            SizedBox(height: 8),
+            Text(
+              'The App is not intended for use by children under the age of 13. We do not knowingly collect any information from children. If you are a parent or guardian and believe a child under 13 has used the App, please contact us, and we will ensure no data is retained (though, as stated, no data is collected).',
             ),
-            const SizedBox(height: 16),
-
-            const Text(
-              '8. Contact Us',
+            SizedBox(height: 16),
+            Text(
+              '8. Changes to This Privacy Policy',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'If you have any questions or concerns about this Privacy Policy, please contact us at:\n\n📧 juliepowellofficial@gmail.com',
+            SizedBox(height: 8),
+            Text(
+              'We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. Any updates will be posted within the App, and the effective date will be revised accordingly. We encourage you to review this policy periodically.',
             ),
-
-            const SizedBox(height: 32),
-            const Divider(thickness: 1),
-            const SizedBox(height: 16),
-
-            // Link to Privacy Policy
-            ListTile(
-              leading: const Icon(Icons.privacy_tip),
-              title: const Text(
-                'Read Full Privacy Policy',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap:
-                  () => _launchUrl(
-                    'https://pinterestvideodownloader.pro/privacy-policy',
-                  ),
+            SizedBox(height: 16),
+            Text(
+              '9. Contact Us',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-
-            // Link to main tool
-            ListTile(
-              leading: const Icon(Icons.download_for_offline),
-              title: const Text(
-                'Go to Our Website',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onTap: () => _launchUrl('https://pinterestvideodownloader.pro/'),
+            SizedBox(height: 8),
+            Text(
+              'If you have questions, email us at: juliepowellofficial@gmail.com\nAddress: Pakistan, Islamabad',
             ),
+            SizedBox(height: 16),
+            Text(
+              '10. Compliance with Google Play Store Policies',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'This policy complies with Google Play Store requirements. Using the App means you agree to this policy.',
+            ),
+            SizedBox(height: 32),
+            Divider(thickness: 1),
+            SizedBox(height: 16),
           ],
         ),
+      ),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.privacy_tip),
+            title: const Text(
+              'Read Full Privacy Policy',
+              style: TextStyle(
+                decoration: TextDecoration.underline,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onTap:
+                () => _launchUrl(
+                  'https://pinterestvideodownloader.pro/privacy-policy',
+                ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.download_for_offline),
+            title: const Text(
+              'Go to Our Website',
+              style: TextStyle(
+                decoration: TextDecoration.underline,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            onTap: () => _launchUrl('https://pinterestvideodownloader.pro/'),
+          ),
+        ],
       ),
     );
   }
