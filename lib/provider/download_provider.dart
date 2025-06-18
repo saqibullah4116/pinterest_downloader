@@ -66,7 +66,8 @@ class DownloadProvider with ChangeNotifier {
           tempPath,
           options: Options(
             headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; PinterestDownloader/1.0)',
+              'User-Agent':
+                  'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 Chrome/86.0.4240.110 Mobile Safari/537.36',
             },
           ),
           onReceiveProgress: (received, total) {
@@ -133,8 +134,7 @@ class DownloadProvider with ChangeNotifier {
         url,
         savePath,
         options: Options(
-          headers: {'Authorization': 'Bearer $token'},
-          responseType: ResponseType.bytes, // or ResponseType.stream works too
+          responseType: ResponseType.bytes,
         ),
         onReceiveProgress: (received, total) {
           if (total != -1) {
