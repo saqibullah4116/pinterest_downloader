@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinterest_downloader/l10n/app_localizations.dart';
+import 'package:pinterest_downloader/screens/ad_banner.dart';
 import 'package:provider/provider.dart';
 import '../components/preview_bottom_sheet.dart';
 import '../provider/preview_provider.dart';

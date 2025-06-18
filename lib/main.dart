@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:pinterest_downloader/components/language_selector_menu.dart';
 import 'package:pinterest_downloader/l10n/app_localizations.dart';
 import 'package:pinterest_downloader/provider/auth_provider.dart';
@@ -15,6 +16,8 @@ import 'provider/preview_provider.dart';
 import 'provider/download_provider.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
   runApp(
     MultiProvider(
       providers: [
